@@ -1,6 +1,6 @@
 # matixs-mod-installer-rn
 
-### Class Structure
+## Class Structure
 ![The image could not be loaded. Please open the image manually (class-structure.svg)](class-structure.svg)
 
 ## Project setup
