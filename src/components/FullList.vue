@@ -27,4 +27,8 @@ div.content {
     background-color: rgba(255, 255, 255, 0.02);
     overflow: hidden;
 }
+
+h4 {
+    font-size: 1rem;
+}
 </style>

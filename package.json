@@ -20,16 +20,20 @@
     "main": "background.js",
     "dependencies": {
         "@wuild/vue-titlebar": "^1.0.1",
+        "axios": "^0.21.1",
         "core-js": "^3.6.5",
+        "minecraft-launcher-core": "^3.16.2",
+        "uuid": "^8.3.2",
         "vue": "^2.6.11",
         "vue-luxon": "^0.10.0",
+        "vue-markdown-render": "^1.1.1",
         "vue-meta": "^2.4.0",
         "vue-router": "^3.2.0"
     },
     "devDependencies": {
         "@vue/cli-plugin-babel": "~4.5.0",
         "@vue/cli-plugin-eslint": "~4.5.0",
-        "@vue/cli-plugin-router": "^4.5.11",
+        "@vue/cli-plugin-router": "^4.5.12",
         "@vue/cli-service": "~4.5.0",
         "babel-eslint": "^10.1.0",
         "electron": "9.0.0",

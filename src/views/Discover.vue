@@ -10,7 +10,7 @@
                     category: 'New Modpack', 
                     text: 'Optimize your survival gameplay with this great modpack!',
                     button: 'Play now',
-                    target: '/discover/0'
+                    target: '/discover/0/'
                 }, 
                 {
                     modpack: 'OptiFine for Forge 1.16.4', 
@@ -20,7 +20,7 @@
                     category: 'New Modpack', 
                     text: 'Tune up your game with the OptiFine extension. Get the best visual experience out of Minecraft!',
                     button: 'Learn more',
-                    target: '/discover/1'
+                    target: '/discover/1/'
                 },
                 {
                     modpack: 'Star Wars: Conquest', 
@@ -30,7 +30,7 @@
                     category: 'New Modpack', 
                     text: 'Travel to new worlds, complete quests, forge your own lightsabers, and build your own ship as you explore a galaxy far, far away!',
                     button: 'Discover the Galaxy',
-                    target: '/discover/2'
+                    target: '/discover/2/'
                 },
                 {
                     modpack: 'Minecraft SKY', 
@@ -40,7 +40,7 @@
                     category: 'New Modpack', 
                     text: 'Just a tree. That is all you get to build up your own steampunk empire in the skies!',
                     button: 'Try now',
-                    target: '/discover/3'
+                    target: '/discover/3/'
                 },
                 {
                     modpack: 'RL Craft',
@@ -50,7 +50,7 @@
                     category: 'New Modpack',
                     text: 'You want Ultra-Hardcore-Minecraft? Then RL Craft is perfect for your desires.',
                     button: 'Get Real',
-                    target: '/discover/4'
+                    target: '/discover/4/'
                 }
             ]" />
 

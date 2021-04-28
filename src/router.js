@@ -23,18 +23,37 @@ export default new Router({
         },
         {
             path: "/library/:id",
+            alias: "/discover/:id",
             name: "modpack",
             component: () => import("./views/Modpack.vue"),
+            children: [
+                {
+                    path: "",
+                    alias: "overview",
+                    name: "modpack-overview",
+                    component: () => import("./views/Modpack/Overview.vue"),
+                },
+                {
+                    path: "mods",
+                    name: "modpack-mods",
+                    component: () => import("./views/Modpack/Mods.vue"),
+                },
+                {
+                    path: "news",
+                    name: "modpack-news",
+                    component: () => import("./views/Modpack/News.vue"),
+                },
+                {
+                    path: "comments",
+                    name: "modpack-comments",
+                    component: () => import("./views/Modpack/Comments.vue"),
+                },
+            ],
         },
         {
             path: "/discover",
             name: "discover",
             component: () => import("./views/Discover.vue"),
-        },
-        {
-            path: "/discover/:id",
-            name: "modpack",
-            component: () => import("./views/Modpack.vue"),
         },
         {
             path: "/settings",
