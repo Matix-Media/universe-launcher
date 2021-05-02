@@ -1,6 +1,7 @@
 module.exports = {
     pluginOptions: {
         electronBuilder: {
+            nodeIntegration: true,
             builderOptions: {
                 productName: "UNIVERSE Launcher",
                 appId: "net.matix-media.universe-launcher",
@@ -26,10 +27,10 @@ module.exports = {
                     icon: "./src/assets/images/branding/icon.icns",
                 },
                 win: {
-                    icon: "./src/assets/images/branding/icon.ico",
+                    icon: "./src/assets/images/branding/app_icon.ico",
                 },
                 linux: {
-                    icon: "./src/assets/images/branding/icon.png",
+                    icon: "./src/assets/images/branding/app_icon.png",
                 },
             },
         },

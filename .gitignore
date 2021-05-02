@@ -2,6 +2,7 @@
 node_modules
 /dist
 /build
+electron-builder.yml
 
 # local env files
 .env.local

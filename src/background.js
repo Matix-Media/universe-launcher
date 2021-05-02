@@ -1,6 +1,7 @@
 "use strict";
 
 import { app, protocol, BrowserWindow, ipcMain } from "electron";
+import { autoUpdater } from "electron-updater";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 const isDevelopment = process.env.NODE_ENV !== "production";
@@ -10,9 +11,11 @@ protocol.registerSchemesAsPrivileged([
     { scheme: "app", privileges: { secure: true, standard: true } },
 ]);
 
+var win;
+
 async function createWindow() {
     // Create the browser window.
-    const win = new BrowserWindow({
+    win = new BrowserWindow({
         width: 1420,
         height: 820,
         minWidth: 1040,
@@ -23,6 +26,7 @@ async function createWindow() {
             nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
         },
     });
+
     win.setMenuBarVisibility(false);
     win.setMenu(null);
     if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -66,10 +70,6 @@ app.on("ready", async () => {
     createWindow();
 });
 
-ipcMain.on("app_version", (event) => {
-    event.sender.send("app_version", { version: app.getVersion() });
-});
-
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
     if (process.platform === "win32") {
@@ -84,3 +84,38 @@ if (isDevelopment) {
         });
     }
 }
+
+// IPC Remote events
+
+ipcMain.on("app_version", (event) => {
+    event.sender.send("app_version", { version: app.getVersion() });
+});
+
+ipcMain.on("check_updates", (event) => {
+    console.log("Checking for updates...");
+    autoUpdater.checkForUpdatesAndNotify();
+    if (isDevelopment) event.sender.send("update_info", { updateAvailable: false });
+});
+
+ipcMain.on("restart_app", () => {
+    autoUpdater.quitAndInstall();
+});
+
+autoUpdater.on("update-available", () => {
+    console.log("update available");
+    win.webContents.send("update_info", { updateAvailable: true });
+});
+
+autoUpdater.on("update-not-available", () => {
+    console.log("no update available");
+    win.webContents.send("update_info", { updateAvailable: false });
+});
+
+autoUpdater.on("update-downloaded", () => {
+    win.webContents.send("update_downloaded");
+});
+
+autoUpdater.on("error", (error) => {
+    win.webContents.send("update_info", { updateAvailable: false });
+    console.error("Error while updating: " + error);
+});

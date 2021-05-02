@@ -14,7 +14,8 @@
 </template>
 
 <script>
-import ipcRenderer from "electron"
+//import ipcRenderer from "electron"
+const { ipcRenderer } = require("electron")
 
 export default {
     name: "Splash",
@@ -31,32 +32,49 @@ export default {
 
                 // Checking for updates
                 this.loadingText = "Checking for updates..."
+                this.progress = 5
                 ipcRenderer.send("app_version")
                 ipcRenderer.on("app_version", (event, args) => {
-                    this.$user.setAppVersion(args.version)
+                    const installedVersion = args.version
+                    console.log("Installed version: " + installedVersion)
+                    ipcRenderer.send("check_updates");
+                    ipcRenderer.on("update_info", (event, args) => {
+                        if (args.updateAvailable) {
+                            console.log("Update available!");
+                            this.loadingText = "Downloading updates..."
+                            ipcRenderer.on("update_downloaded", () => {
+                                this.loadingText = "Update downloaded. Restarting..."
+                                setTimeout(() => {
+                                    ipcRenderer.send("restart_app")
+                                }, 1000);
+                            })
+                        } else {
+                            console.log("No update available");
 
-                    // Reading configs
-                    this.loadingText = "Loading library..."
-                    this.progress = 40
+                            // Reading configs
+                            this.loadingText = "Loading library..."
+                            this.progress = 40
 
-                    this.loadingText = "Loading sessions..."
-                    this.progress = 46
+                            this.loadingText = "Loading sessions..."
+                            this.progress = 46
 
-                    this.loadingText = "Loading config..."
-                    this.progress = 48
+                            this.loadingText = "Loading config..."
+                            this.progress = 48
 
-                    // Checking saved accounts
-                    this.loadingText = "Syncing profiles..."
-                    this.progress = 50
+                            // Checking saved accounts
+                            this.loadingText = "Syncing profiles..."
+                            this.progress = 50
 
-                    // Ready!
-                    this.loadingText = "Ready to discover new universe!"
-                    this.progress = 100
-                    this.isDone = true
+                            // Ready!
+                            this.loadingText = "Ready to discover new universe!"
+                            this.progress = 100
+                            this.isDone = true
 
-                    setTimeout(() => {
-                        this.$emit("done")
-                    }, 2000)
+                            setTimeout(() => {
+                                this.$emit("done")
+                            }, 2000)
+                        }
+                    })
                 })
             }, 1000)
         })
@@ -113,6 +131,7 @@ div.box p {
 
     margin-left: .4rem;
     margin-bottom: .3rem;
+    transform: translateZ(0) translate3d(0,0,0);
     
     color: rgba(255, 255, 255, 0.40);
 }
