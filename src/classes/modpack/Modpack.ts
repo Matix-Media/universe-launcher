@@ -4,6 +4,23 @@ import Comment from "./Comment"
 import Stats from "./Stats"
 import News from "./News"
 
+interface IModpack {
+    id: number,
+    name: string,
+    author: Author,
+    versionReleaseDate: Date,
+    releaseDate: Date,
+    description: string,
+    version: string,
+    gameVersion: string,
+    commentsAmount: number,
+    downloads: number,
+    likes: number,
+    logo: string,
+    icon: string,
+    cover: string
+}
+
 export default class Modpack {
     id!: number
     name!: string
@@ -32,15 +49,11 @@ export default class Modpack {
         author: Author,
         versionReleaseDate: Date,
         releaseDate: Date,
-        mods: Array<Mod>,
         version: string,
         gameVersion: string,
-        comments: Array<Comment>,
         commentsAmount: number,
         downloads: number,
         likes: number,
-        stats: Stats,
-        news: Array<News>,
         logo: string,
         icon: string,
         cover: string,
@@ -51,19 +64,49 @@ export default class Modpack {
         this.author = author
         this.versionReleaseDate = versionReleaseDate
         this.releaseDate = releaseDate
-        this.mods.concat(mods)
         this.version = version
         this.gameVersion = gameVersion
-        this.comments.concat(comments)
         this.commentsAmount = commentsAmount
         this.downloads = downloads
         this.likes = likes
-        this.stats = stats
-        this.news.concat(news)
         this.logo = logo
         this.icon = icon
         this.cover = cover
         this.description = description
+    }
+
+    /**
+     * Parse Object to new Modpack object
+     * @param obj to parse
+     * @returns new Modpack
+     */
+    static parse(obj: object): Modpack {
+        var default_: IModpack = {
+            id: -1, 
+            name: "", 
+            author: null, 
+            versionReleaseDate: null,
+            releaseDate: null,
+            version: "", 
+            gameVersion: "", 
+            commentsAmount: -1, 
+            downloads: -1, 
+            likes: -1, 
+            logo: "", 
+            icon: "", 
+            cover: "", 
+            description: ""
+        }
+        if ("author" in obj)
+            obj["author"] = Author.parse(obj["author"])
+        if ("versionReleaseDate" in obj)
+            obj["versionReleaseDate"] = Date.parse(obj["versionReleaseDate"])
+        if ("releaseDate" in obj)
+            obj["releaseDate"] = Date.parse(obj["releaseDate"])
+
+        var parsed: IModpack = Object.assign(default_, obj)
+
+        return new Modpack(parsed.id, parsed.name, parsed.author, parsed.versionReleaseDate, parsed.releaseDate, parsed.version, parsed.gameVersion, parsed.commentsAmount, parsed.downloads, parsed.likes, parsed.logo, parsed.icon, parsed.cover, parsed.description)
     }
 
     /**

@@ -13,6 +13,23 @@ export default class Author {
     }
 
     /**
+     * Parse object to new Author object
+     * @param obj to parse
+     * @returns new Author
+     */
+    static parse(obj: any): Author {
+        var id: number = -1
+        var name: string = ""
+
+        if ("id" in obj)
+            id = obj.id
+        if ("name" in obj)
+            name = obj.name
+
+        return new Author(id, name)
+    }
+
+    /**
      * 
      * @returns The ID of the Author
      */

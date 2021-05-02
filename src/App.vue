@@ -1,22 +1,25 @@
 <template>
   <div id="app" :style="backgroundImage">
-
     <div class="wrapper">
+
       <Sidebar></Sidebar>
       <transition name="fade" mode="out-in">
         <router-view />
       </transition>
+      <splash v-if="loading" v-on:done="loading=false" />
     </div>
   </div>
 </template>
 
 <script>
 import Sidebar from './components/Sidebar.vue'
+import Splash from "./views/Splash.vue"
 
 export default {
   name: 'App',
   components: {
-    Sidebar
+    Sidebar,
+    Splash
   },
   created() {
     Array.prototype.remove = function() {
@@ -29,6 +32,11 @@ export default {
       }
       return this;
     };
+  },
+  data() {
+    return {
+      loading: true
+    }
   },
   computed: {
     backgroundImage() {
@@ -46,7 +54,7 @@ export default {
   },
   metaInfo() {
     return {
-      title: "Matix's Mod Installer - RN"
+      title: "UNIVERSE Launcher"
     }
   }
 }

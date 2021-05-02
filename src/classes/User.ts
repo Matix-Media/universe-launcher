@@ -10,6 +10,7 @@ export default class User {
     discovery!: DiscoveryInfo
     accounts: Array<Account> = new Array<Account>()
     sessions: Array<Session> = new Array<Session>()
+    appVersion: string
 
     cachedModpacks: Map<number, Modpack> = new Map<number, Modpack>()
     cachedAuthors: Map<number, Author> = new Map<number, Author>()
@@ -69,6 +70,22 @@ export default class User {
      */
     getDiscovery(): DiscoveryInfo {
         return this.discovery
+    }
+
+    /**
+     * 
+     * @returns the version of the installed app
+     */
+    getAppVersion(): string {
+        return this.appVersion
+    }
+
+    /**
+     * 
+     * @param appVersion Set the version of the app
+     */
+    setAppVersion(appVersion: string): void {
+        this.appVersion = appVersion
     }
 
     /**

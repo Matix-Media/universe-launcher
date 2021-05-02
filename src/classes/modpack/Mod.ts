@@ -1,3 +1,11 @@
+interface IMod {
+    path: string,
+    name: string,
+    author: string,
+    description: string,
+    url: string
+}
+
 export default class Mod {
     path!: String
     name!: String
@@ -17,6 +25,18 @@ export default class Mod {
         this.author = author
         this.description = description
         this.url = url
+    }
+
+    /**
+     * Parse object to new Mod object
+     * @param obj to parse
+     * @returns new Mod
+     */
+    static parse(obj: object): Mod {
+        var default_: IMod = {path: "", name: "", author: "", description: "", url: ""}
+        var parsed: IMod = Object.assign(default_, obj)
+
+        return new Mod(parsed.path, parsed.name, parsed.author, parsed.description, parsed.url)
     }
 
     /**

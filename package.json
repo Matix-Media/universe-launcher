@@ -1,67 +1,73 @@
 {
-    "name": "matixs-mod-installer-rn",
-    "description": "Matix's Mod Installer is Matix's Mod Installer is the newly designed platform to install your Minecraft modpacks!",
-    "author": {
-        "name": "Max Heilmann",
-        "email": "heilmann@matix-media.net",
-        "url": "https://matix-media.net"
+  "name": "matixs-mod-installer-rn",
+  "version": "0.1.2",
+  "private": true,
+  "description": "Matix's Mod Installer is Matix's Mod Installer is the newly designed platform to install your Minecraft modpacks!",
+  "author": {
+    "name": "Max Heilmann",
+    "email": "heilmann@matix-media.net",
+    "url": "https://matix-media.net"
+  },
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps"
+  },
+  "main": "background.js",
+  "dependencies": {
+    "@wuild/vue-titlebar": "^1.0.1",
+    "axios": "^0.21.1",
+    "core-js": "^3.6.5",
+    "electron-updater": "^4.3.8",
+    "minecraft-launcher-core": "^3.16.2",
+    "uuid": "^8.3.2",
+    "vue": "^2.6.11",
+    "vue-luxon": "^0.10.0",
+    "vue-markdown-render": "^1.1.1",
+    "vue-meta": "^2.4.0",
+    "vue-router": "^3.2.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-router": "^4.5.12",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/eslint-config-typescript": "^5.0.2",
+    "babel-eslint": "^10.1.0",
+    "electron": "9.0.0",
+    "electron-devtools-installer": "^3.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "sass": "^1.32.5",
+    "sass-loader": "^10.1.1",
+    "typescript": "~4.1.5",
+    "vue-cli-plugin-electron-builder": "^2.0.0-rc.5",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
     },
-    "version": "0.1.2",
-    "private": true,
-    "scripts": {
-        "serve": "vue-cli-service serve",
-        "build": "vue-cli-service build",
-        "lint": "vue-cli-service lint",
-        "electron:build": "vue-cli-service electron:build",
-        "electron:serve": "vue-cli-service electron:serve",
-        "postinstall": "electron-builder install-app-deps",
-        "postuninstall": "electron-builder install-app-deps"
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended",
+      "@vue/typescript"
+    ],
+    "parserOptions": {
+      "parser": "@typescript-eslint/parser"
     },
-    "main": "background.js",
-    "dependencies": {
-        "@wuild/vue-titlebar": "^1.0.1",
-        "axios": "^0.21.1",
-        "core-js": "^3.6.5",
-        "minecraft-launcher-core": "^3.16.2",
-        "uuid": "^8.3.2",
-        "vue": "^2.6.11",
-        "vue-luxon": "^0.10.0",
-        "vue-markdown-render": "^1.1.1",
-        "vue-meta": "^2.4.0",
-        "vue-router": "^3.2.0"
-    },
-    "devDependencies": {
-        "@vue/cli-plugin-babel": "~4.5.0",
-        "@vue/cli-plugin-eslint": "~4.5.0",
-        "@vue/cli-plugin-router": "^4.5.12",
-        "@vue/cli-service": "~4.5.0",
-        "babel-eslint": "^10.1.0",
-        "electron": "9.0.0",
-        "electron-devtools-installer": "^3.1.0",
-        "eslint": "^6.7.2",
-        "eslint-plugin-vue": "^6.2.2",
-        "sass": "^1.32.5",
-        "sass-loader": "^10.1.1",
-        "vue-cli-plugin-electron-builder": "^2.0.0-rc.5",
-        "vue-template-compiler": "^2.6.11"
-    },
-    "eslintConfig": {
-        "root": true,
-        "env": {
-            "node": true
-        },
-        "extends": [
-            "plugin:vue/essential",
-            "eslint:recommended"
-        ],
-        "parserOptions": {
-            "parser": "babel-eslint"
-        },
-        "rules": {}
-    },
-    "browserslist": [
-        "> 1%",
-        "last 2 versions",
-        "not dead"
-    ]
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
 }

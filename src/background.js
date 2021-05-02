@@ -1,6 +1,6 @@
 "use strict";
 
-import { app, protocol, BrowserWindow } from "electron";
+import { app, protocol, BrowserWindow, ipcMain } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 const isDevelopment = process.env.NODE_ENV !== "production";
@@ -16,7 +16,7 @@ async function createWindow() {
         width: 1420,
         height: 820,
         minWidth: 1040,
-        title: "Matix's Mod Installer RN",
+        title: "UNIVERSE Launcher",
         webPreferences: {
             // Use pluginOptions.nodeIntegration, leave this alone
             // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -64,6 +64,10 @@ app.on("ready", async () => {
         }
     }
     createWindow();
+});
+
+ipcMain.on("app_version", (event) => {
+    event.sender.send("app_version", { version: app.getVersion() });
 });
 
 // Exit cleanly on request from parent process in development mode.

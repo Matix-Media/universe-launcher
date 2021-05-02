@@ -2,8 +2,8 @@ module.exports = {
     pluginOptions: {
         electronBuilder: {
             builderOptions: {
-                productName: "Matix's Mod Installer - RN",
-                appId: "net.matix-media.matixs-mod-installer",
+                productName: "UNIVERSE Launcher",
+                appId: "net.matix-media.universe-launcher",
                 dmg: {
                     contents: [
                         {

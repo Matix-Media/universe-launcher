@@ -129,7 +129,7 @@ export default {
 
 .banner .info-bar .info {
     color: rgba(255, 255, 255, 0.75);
-    margin-left: 1rem;
+    margin-left: .7rem;
 }
 
 .banner .info-bar .info .name {
