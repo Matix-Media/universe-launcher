@@ -4,7 +4,7 @@
         "url": "https://github.com/Matix-Media/universe-launcher.git"
     },
     "name": "matixs-mod-installer-rn",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "private": true,
     "description": "Matix's Mod Installer is Matix's Mod Installer is the newly designed platform to install your Minecraft modpacks!",
     "author": {
