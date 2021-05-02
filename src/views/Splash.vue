@@ -73,7 +73,7 @@ export default {
                             this.loadingText = "Downloading updates..."
                             ipcRenderer.on("update_download_progress", (event, args) => {
                                 this.progress = args.percent;
-                                this.loadingText = "Downloading updates... (" + this.humanFileSize(args.bytesPerSecond) + ")"
+                                this.loadingText = "Downloading updates... (" + this.humanFileSize(args.bytesPerSecond, true) + "/s)"
                             })
                             ipcRenderer.on("update_downloaded", () => {
                                 this.loadingText = "Update downloaded. Restarting..."
