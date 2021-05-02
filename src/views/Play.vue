@@ -2,8 +2,8 @@
     <div class="play">
         <full-list title="Accounts" class="accounts" :padding="0">
             <div class="accounts-list">
-                <account username="MindOfMatix" email="account.raketengamelp@web.de" :microsoft="false" :default="true" />
-                <account username="TheSecondAnton" email="matix.skype@web.de" :microsoft="true" :default="false" />
+                <account username="MindOfMatix" email="example@gmail.com" :microsoft="false" :default="true" />
+                <account username="TheSecondAnton" email="example@web.de" :microsoft="true" :default="false" />
             </div>
         </full-list>
         <full-list title="Sessions" class="sessions" :padding="0">
