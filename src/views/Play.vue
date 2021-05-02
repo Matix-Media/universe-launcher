@@ -8,7 +8,7 @@
         </full-list>
         <full-list title="Sessions" class="sessions" :padding="0">
             <div class="sessions-list">
-                <session name="Survival Default Kit" icon="https://imgur.com/eiuJs3z.png" :active="true" username="MindOfMatix" email="account.raketengamelp@web.de" length="10 min" />
+                <session name="Survival Default Kit" icon="https://imgur.com/eiuJs3z.png" :active="true" username="MindOfMatix" email="example@gmail.com" length="10 min" />
             </div>
         </full-list>
     </div>
