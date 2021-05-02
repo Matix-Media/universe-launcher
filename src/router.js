@@ -24,7 +24,6 @@ export default new Router({
         {
             path: "/library/:id",
             alias: "/discover/:id",
-            name: "modpack",
             component: () => import("./views/Modpack.vue"),
             children: [
                 {
