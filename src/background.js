@@ -111,6 +111,10 @@ autoUpdater.on("update-not-available", () => {
     win.webContents.send("update_info", { updateAvailable: false });
 });
 
+autoUpdater.on("download-progress", (info) => {
+    win.webContents.send("update_download_progress", info);
+});
+
 autoUpdater.on("update-downloaded", () => {
     win.webContents.send("update_downloaded");
 });

@@ -30,6 +30,29 @@ export default {
             isDone: false
         }
     },
+    methods: {
+        humanFileSize(bytes, si=false, dp=1) {
+            const thresh = si ? 1000 : 1024;
+
+            if (Math.abs(bytes) < thresh) {
+                return bytes + ' B';
+            }
+
+            const units = si 
+                ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] 
+                : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+            let u = -1;
+            const r = 10**dp;
+
+            do {
+                bytes /= thresh;
+                ++u;
+            } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1);
+
+
+            return bytes.toFixed(dp) + ' ' + units[u];
+        }
+    },
     mounted() {
         this.$nextTick(() => {
             ipcRenderer.send("app_version")
@@ -48,6 +71,10 @@ export default {
                         if (args.updateAvailable) {
                             console.log("Update available!");
                             this.loadingText = "Downloading updates..."
+                            ipcRenderer.on("update_download_progress", (event, args) => {
+                                this.progress = args.percent;
+                                this.loadingText = "Downloading updates... (" + this.humanFileSize(args.bytesPerSecond) + ")"
+                            })
                             ipcRenderer.on("update_downloaded", () => {
                                 this.loadingText = "Update downloaded. Restarting..."
                                 setTimeout(() => {
