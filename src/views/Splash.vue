@@ -6,7 +6,10 @@
                 <img src="@/assets/images/branding/logo_text.png" alt="">
             </div>
 
-            <p>{{loadingText}}</p>
+            <div class="text">
+                <p>{{loadingText}}</p>
+                <p class="version">v{{version}}</p>
+            </div>
 
             <span :style="{ width: progress + '%' }"></span>
         </div>
@@ -23,20 +26,23 @@ export default {
         return {
             loadingText: "Preparing rockets...",
             progress: 0,
+            version: "...",
             isDone: false
         }
     },
     mounted() {
         this.$nextTick(() => {
-            setTimeout(() => {
+            ipcRenderer.send("app_version")
+            ipcRenderer.on("app_version", (event, args) => {
+            const installedVersion = args.version
+            this.version = installedVersion
+            console.log("Installed version: " + installedVersion)
 
-                // Checking for updates
-                this.loadingText = "Checking for updates..."
-                this.progress = 5
-                ipcRenderer.send("app_version")
-                ipcRenderer.on("app_version", (event, args) => {
-                    const installedVersion = args.version
-                    console.log("Installed version: " + installedVersion)
+                setTimeout(() => {
+                    // Checking for updates
+                    this.loadingText = "Checking for updates..."
+                    this.progress = 5
+
                     ipcRenderer.send("check_updates");
                     ipcRenderer.on("update_info", (event, args) => {
                         if (args.updateAvailable) {
@@ -75,8 +81,8 @@ export default {
                             }, 2000)
                         }
                     })
-                })
-            }, 1000)
+                }, 1000)
+            })
         })
     }
 }
@@ -126,14 +132,23 @@ div.logo .icon {
     height: 5rem;
 }
 
-div.box p {
+div.box .text {
+    display: flex;
+    justify-content: space-between;
+}
+
+div.box .text p {
     font-size: 1.1em;
 
-    margin-left: .4rem;
+    margin: 0 .4rem;
     margin-bottom: .3rem;
     transform: translateZ(0) translate3d(0,0,0);
     
     color: rgba(255, 255, 255, 0.40);
+}
+
+div.box .text p.version {
+    color: rgba(255, 255, 255, 0.1);
 }
 
 div.box span {
