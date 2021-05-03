@@ -3,7 +3,7 @@
         "type": "git",
         "url": "https://github.com/Matix-Media/universe-launcher.git"
     },
-    "name": "matixs-mod-installer-rn",
+    "name": "universe-launcher",
     "version": "0.1.5",
     "private": true,
     "description": "UNIVERSE Launcher is the best designed platform to install your Minecraft modpacks!",
