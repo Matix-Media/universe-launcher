@@ -4,10 +4,6 @@ import router from "./router";
 import VueLuxon from "vue-luxon";
 import VueMeta from "vue-meta";
 
-const VueTitlebar = require("@wuild/vue-titlebar");
-
-Vue.use(VueTitlebar);
-
 Vue.use(VueLuxon, {
     output: {
         locale: "en-US",
