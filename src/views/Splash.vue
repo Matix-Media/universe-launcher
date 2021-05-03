@@ -62,9 +62,13 @@ export default {
             console.log("Installed version: " + installedVersion)
 
                 setTimeout(() => {
+                    // Checking API status
+                    this.loadingText = "Checking servers..."
+                    this.progress = 10
+
                     // Checking for updates
                     this.loadingText = "Checking for updates..."
-                    this.progress = 5
+                    this.progress = 23
 
                     ipcRenderer.send("check_updates");
                     ipcRenderer.on("update_info", (event, args) => {
