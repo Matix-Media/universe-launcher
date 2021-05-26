@@ -1,23 +1,82 @@
 <template>
     <div class="home">
-        <div class="news" v-if="!$api.offlineMode">
-            <h3>News</h3>
-            <div class="content">
-                <NewsSmall v-for="article in data.news" :key="article.ID" :icon="article.modpack.icon" :modpack="article.modpack.name" :title="article.title" :content="article.shortened" :date="article.created" :modpackTarget="'/library/' + article.modpack.ID" :newsId="article.ID" />
+        <div class="skeleton-loader" v-if="isLoading">
+            <div class="sk-bg" style="margin: 0 3rem 0 2rem;height:12rem;border-top-left-radius:0;border-top-right-radius:0">
+                <div class="sk" style="height:1.5rem;width:5rem;margin:.8rem .5rem"></div>
+                <div style="margin:1.2rem .5rem;display:flex;">
+                    <div style="margin-right:3rem">
+                        <div class="sk" style="height:1.3rem;width:10rem;"></div>
+                        <div class="sk" style="height:1rem;width:8rem;margin-top:.6rem;"></div>
+                        <div class="sk" style="height:1rem;width:9rem;margin-top:.3rem;"></div>
+                        <div class="sk" style="height:1rem;width:12rem;margin-top:.3rem;"></div>
+                    </div>
+                    <div style="margin-right:3rem">
+                        <div class="sk" style="height:1.3rem;width:10rem;"></div>
+                        <div class="sk" style="height:1rem;width:8rem;margin-top:.6rem;"></div>
+                        <div class="sk" style="height:1rem;width:9rem;margin-top:.3rem;"></div>
+                        <div class="sk" style="height:1rem;width:12rem;margin-top:.3rem;"></div>
+                    </div>
+                    <div style="margin-right:3rem">
+                        <div class="sk" style="height:1.3rem;width:10rem;"></div>
+                        <div class="sk" style="height:1rem;width:8rem;margin-top:.6rem;"></div>
+                        <div class="sk" style="height:1rem;width:9rem;margin-top:.3rem;"></div>
+                        <div class="sk" style="height:1rem;width:12rem;margin-top:.3rem;"></div>
+                    </div>
+                    <div>
+                        <div class="sk" style="height:1.3rem;width:10rem;"></div>
+                        <div class="sk" style="height:1rem;width:8rem;margin-top:.6rem;"></div>
+                        <div class="sk" style="height:1rem;width:9rem;margin-top:.3rem;"></div>
+                        <div class="sk" style="height:1rem;width:12rem;margin-top:.3rem;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="sk-bg" style="margin:1.5rem 3rem 0 2rem">
+                <div class="sk" style="margin:.5rem;width:8rem;height:1.5rem;"></div>
+                <div style="margin-top: .5rem;display:flex;">
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                </div>
+            </div>
+            <div class="sk-bg" style="margin:1.5rem 3rem 0 2rem">
+                <div class="sk" style="margin:.5rem;width:8rem;height:1.5rem;"></div>
+                <div style="margin-top: .5rem;display:flex;">
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                    <div class="sk" style="width: 6.5rem; height: 9rem;margin:.5rem"></div>
+                </div>
             </div>
         </div>
-        <div class="lists">
-            <full-list title="RECENTLY PLAYED">
-                <div class="list-recently-played list">
-                    <modpack-small v-for="modpack in data.recentlyPlayed" :key="modpack.ID" :image="modpack.cover" :target="'/library/' + modpack.ID" />
+        <div class="loaded-page-content" v-if="!isLoading">
+            <div class="news" v-if="!$api.offlineMode">
+                <h3>News</h3>
+                <div class="content">
+                    <NewsSmall v-for="article in data.news" :key="article.ID" :icon="article.modpack.icon" :modpack="article.modpack.name" :title="article.title" :content="article.shortened" :date="article.created" :modpackTarget="'/library/' + article.modpack.ID" :newsId="article.ID" />
                 </div>
-            </full-list>
+            </div>
+            <div class="lists">
+                <full-list title="RECENTLY PLAYED">
+                    <div class="list-recently-played list">
+                        <modpack-small v-for="modpack in data.recentlyPlayed" :key="modpack.ID" :image="modpack.cover" :target="'/library/' + modpack.ID" />
+                    </div>
+                </full-list>
 
-            <full-list title="FAVORITE MODPACKS">
-                <div class="list-your-modpacks list">
-                    <modpack-small v-for="modpack in data.favorites" :key="modpack.ID" :image="modpack.cover" :target="'/library/' + modpack.ID" />
-                </div>
-            </full-list>
+                <full-list title="FAVORITE MODPACKS">
+                    <div class="list-your-modpacks list">
+                        <modpack-small v-for="modpack in data.favorites" :key="modpack.ID" :image="modpack.cover" :target="'/library/' + modpack.ID" />
+                    </div>
+                </full-list>
+            </div>
         </div>
     </div>
 </template>
@@ -35,7 +94,7 @@ export default {
     },
     data() {
         return {
-            loading: true,
+            isLoading: false,
             data: {
                 news: [],
                 recentlyPlayed: [],
@@ -49,7 +108,7 @@ export default {
             this.data.news = result.news;
             this.data.recentlyPlayed = result.recentlyPlayed;
             this.data.favorites = result.favorites;
-            this.loading = false;
+            //this.isLoading = false;
         })
     }
 }
