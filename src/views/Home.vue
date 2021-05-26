@@ -1,25 +1,21 @@
 <template>
     <div class="home">
-        <div class="news">
+        <div class="news" v-if="!$api.offlineMode">
             <h3>News</h3>
             <div class="content">
-                <NewsSmall icon="https://imgur.com/eiuJs3z.png" modpack="Survival Default Kit" title="Major Update to 1.2.1 yeah i tried!" content="Finally! We are updating to 1.2.1. With this update you get the updated mods of Xaero's Minimap and much more stuff ready for you to explore. her is some random teyt to fill the space that is currently empty and to some better designing." date="2021-01-25T14:48Z" modpackTarget="/library/0" newsId="1" />
-
-                <NewsSmall icon="https://imgur.com/u1B1co3.png" modpack="OptiFine for Forge 1.16.4" title="Updated OptiFine" content="We updated OptiFine to HD U G6 for Minecraft 1.16.4. This fixed a lot of old bugs from the recent version HD U G5." date="2021-01-07T14:48Z" modpackTarget="/library/1" newsId="0" />
+                <NewsSmall v-for="article in data.news" :key="article.ID" :icon="article.modpack.icon" :modpack="article.modpack.name" :title="article.title" :content="article.shortened" :date="article.created" :modpackTarget="'/library/' + article.modpack.ID" :newsId="article.ID" />
             </div>
         </div>
         <div class="lists">
             <full-list title="RECENTLY PLAYED">
                 <div class="list-recently-played list">
-                    <modpack-small image="https://imgur.com/eiuJs3z.png" target="/library/0" />
-                    <modpack-small image="https://imgur.com/u1B1co3.png" target="/library/1" />
+                    <modpack-small v-for="modpack in data.recentlyPlayed" :key="modpack.ID" :image="modpack.cover" :target="'/library/' + modpack.ID" />
                 </div>
             </full-list>
 
-            <full-list title="YOUR MODPACKS">
+            <full-list title="FAVORITE MODPACKS">
                 <div class="list-your-modpacks list">
-                    <modpack-small image="https://imgur.com/u1B1co3.png" target="/library/1" />
-                    <modpack-small image="https://imgur.com/eiuJs3z.png" target="/library/0" />
+                    <modpack-small v-for="modpack in data.favorites" :key="modpack.ID" :image="modpack.cover" :target="'/library/' + modpack.ID" />
                 </div>
             </full-list>
         </div>
@@ -36,6 +32,25 @@ export default {
         NewsSmall,
         FullList,
         ModpackSmall
+    },
+    data() {
+        return {
+            loading: true,
+            data: {
+                news: [],
+                recentlyPlayed: [],
+                favorites: []
+            }
+        }
+    },
+    mounted() {
+        this.$nextTick(async () => {
+            var result = await this.$api.getHome();
+            this.data.news = result.news;
+            this.data.recentlyPlayed = result.recentlyPlayed;
+            this.data.favorites = result.favorites;
+            this.loading = false;
+        })
     }
 }
 </script>
