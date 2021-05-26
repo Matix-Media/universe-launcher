@@ -1,0 +1,23 @@
+{
+    "accounts": {
+        "accountId": {
+            "type": "Mojang",
+            "id": "...",
+            "accessToken": "...",
+            "clientToken": "...",
+            "login": "...",
+            "UUID": "...",
+            "username": "..."
+        },
+        "accountId2": {
+            "type": "Xbox",
+            "id": "...",
+            "accessToken": "...",
+            "accessTokenExpiration": "0000-00-00T00:00:00Z",
+            "login": "...",
+            "UUID": "...",
+            "username": "..."
+        }
+    },
+    "default": "accountId"
+}

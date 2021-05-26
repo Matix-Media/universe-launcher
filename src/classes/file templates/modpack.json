@@ -1,0 +1,20 @@
+{
+    "ID": 0,
+    "name": "...",
+    "author": "...",
+    "icon": "...",
+    "cover": "...",
+    "banner": "...",
+    "logo": "...",
+    "version": "...",
+    "gameVersion": "...",
+    "sessions": [
+        {
+            "started": "0000-00-00T00:00:00Z",
+            "ended": "0000-00-00T00:00:00Z",
+            "email": "...",
+            "username": "..."
+        }
+    ],
+    "description": "..."
+}

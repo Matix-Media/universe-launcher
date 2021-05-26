@@ -1,0 +1,9 @@
+{
+    "ID": 1,
+    "name": "Survival Default Kit",
+    "description": "Lorem Ipsum",
+    "author": {
+        "ID": 1,
+        "name": "Matix"
+    }
+}

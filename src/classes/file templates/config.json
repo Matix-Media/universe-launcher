@@ -1,0 +1,14 @@
+{
+    "settings": {
+        "throttleDownloads": false,
+        "proxy": {
+            "enabled": false,
+            "host": "",
+            "port": 0
+        }
+    },
+    "notifications": {
+        "modpackReady": true,
+        "news": true
+    }
+}
