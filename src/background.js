@@ -4,7 +4,14 @@ import { app, protocol, BrowserWindow, ipcMain } from "electron";
 import { autoUpdater } from "electron-updater";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
+import path from "path";
+import fs from "fs";
+import electron from "electron";
+import log from "electron-log";
+const shell = electron.shell;
 const isDevelopment = process.env.NODE_ENV !== "production";
+const fsp = fs.promises;
+const initPath = path.join(app.getPath("userData"), "init.json");
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -13,11 +20,19 @@ protocol.registerSchemesAsPrivileged([
 
 var win;
 
-async function createWindow() {
+async function createWindow(args) {
+    var bounds;
+    if (args && args.bounds) {
+        bounds = args.bounds;
+    } else {
+        bounds = {
+            width: 1420,
+            height: 820,
+        };
+    }
     // Create the browser window.
     win = new BrowserWindow({
-        width: 1420,
-        height: 820,
+        ...bounds,
         minWidth: 1040,
         title: "UNIVERSE Launcher",
         webPreferences: {
@@ -28,6 +43,7 @@ async function createWindow() {
         },
     });
 
+    win.setBackgroundColor("#263238");
     win.setMenuBarVisibility(false);
     win.setMenu(null);
     if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -39,6 +55,48 @@ async function createWindow() {
         // Load the index.html when not in development
         win.loadURL("app://./index.html");
     }
+
+    win.on("close", () => {
+        var data = { bounds: win.getBounds() };
+        try {
+            fs.writeFileSync(initPath, JSON.stringify(data));
+            // eslint-disable-next-line no-empty
+        } catch (err) {}
+    });
+
+    win.webContents.on("new-window", function(e, url) {
+        // make sure local urls stay in electron perimeter
+        if ("file://" === url.substr(0, "file://".length)) {
+            return;
+        }
+
+        // and open every other protocols on the browser
+        e.preventDefault();
+        shell.openExternal(url);
+    });
+
+    win.webContents.on("console-message", (e, level, message, line) => {
+        line = line.toString();
+        while (line.length < 5) line = "0" + line;
+        var msg = "(L" + line + ") " + message;
+        switch (level) {
+            case 0:
+                log.verbose(msg);
+                break;
+            case 1:
+                log.info(msg);
+                break;
+            case 2:
+                log.warn(msg);
+                break;
+            case 3:
+                log.error(msg);
+                break;
+            default:
+                log.info(msg);
+                break;
+        }
+    });
 }
 
 // Quit when all windows are closed.
@@ -60,6 +118,11 @@ app.on("activate", () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", async () => {
+    var data;
+    try {
+        data = JSON.parse(await fsp.readFile(initPath, "utf8"));
+        // eslint-disable-next-line no-empty
+    } catch (e) {}
     if (isDevelopment && !process.env.IS_TEST) {
         // Install Vue Devtools
         try {
@@ -68,7 +131,7 @@ app.on("ready", async () => {
             console.error("Vue Devtools failed to install:", e.toString());
         }
     }
-    createWindow();
+    createWindow(data);
 });
 
 // Exit cleanly on request from parent process in development mode.
@@ -87,6 +150,14 @@ if (isDevelopment) {
 }
 
 // IPC Remote events
+
+ipcMain.on("user_data_path", (event) => {
+    event.sender.send("user_data_path", { userData: app.getPath("userData") });
+});
+
+ipcMain.on("log_path", (event) => {
+    event.sender.send("log_path", { logPath: log.transports.file.getFile().path });
+});
 
 ipcMain.on("app_version", (event) => {
     event.sender.send("app_version", { version: app.getVersion() });
@@ -123,4 +194,13 @@ autoUpdater.on("update-downloaded", () => {
 autoUpdater.on("error", (error) => {
     win.webContents.send("update_info", { updateAvailable: false });
     console.error("Error while updating: " + error);
+    log.error("Error while updating: " + error);
+});
+
+ipcMain.on("clear_cache", (event) => {
+    console.log("Clearing electron cache...");
+    win.webContents.session.clearCache(() => {
+        console.log("Successfully cleared caches");
+        event.sender.send("cleared_cache");
+    });
 });
