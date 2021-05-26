@@ -6,7 +6,7 @@
         <router-link to="/library" content="Library">
             <i class="fas fa-th-large"></i>
         </router-link>
-        <router-link to="/discover" content="Discover">
+        <router-link to="/discover" content="Discover" :class="{unavailable: $api.offlineMode}">
             <i class="fas fa-compass"></i>
         </router-link>
         <router-link to="/play" content="Play">
@@ -36,8 +36,9 @@ export default {
         flex-direction: column;
         font-size: 25px;
         align-items: center;
-        z-index: 99999;
+        z-index: 1;
     }
+
 
     a {
         color: rgba(255, 255, 255, 0.6);
@@ -47,8 +48,16 @@ export default {
         text-align: center;
     }
 
-    a:hover, a:focus, a.router-link-active {
+    a:hover:not(.unavailable), 
+    a:focus:not(.unavailable), 
+    a.router-link-active:not(.unavailable) {
         color: white;
         text-shadow: 0px 0px 28px rgba(255,255,255,0.2);
+    }
+
+    a.unavailable {
+        color: rgba(255, 255, 255, 0.1) !important;
+        cursor: default;
+        pointer-events: none;
     }
 </style>
