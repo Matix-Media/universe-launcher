@@ -12,7 +12,8 @@
 
         <full-list title="Others" class="others">
             <a href="mailto:support@matix-media.net">Support</a>
-            <a href="">Show logs</a>
+            <a @click="openLog()">Show logs</a>
+            <a @click="clearCache()" v-if="!cacheCleared">Clear cache</a>
         </full-list>
     </div>
 </template>
@@ -20,10 +21,40 @@
 <script>
 import FullList from '../components/FullList.vue'
 import Checkbox from '../components/controls/Checkbox.vue'
+import { exec } from "child_process";
+const { ipcRenderer } = require("electron")
 
 export default {
     name: "Settings",
-    components: {FullList, Checkbox}
+    components: {FullList, Checkbox},
+    data() {
+        return {
+            cacheCleared: false,
+        }
+    },
+    methods: {
+        getCommandLine() {
+            switch (process.platform) { 
+                case 'darwin' : return 'open';
+                case 'win32' : return 'start';
+                case 'win64' : return 'start';
+                default : return 'xdg-open';
+            }
+        },
+        openLog() {
+            ipcRenderer.send("log_path");
+            ipcRenderer.on("log_path", (e, args) => {
+                exec(this.getCommandLine() + " " + args.logPath)
+            })
+        },
+        clearCache() {
+            if (!this.cacheCleared) {
+                this.cacheCleared = true;
+                this.$api.clearCache();
+                ipcRenderer.send("clear_cache");
+            }
+        }
+    }
 }
 </script>
 
