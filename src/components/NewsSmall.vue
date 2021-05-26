@@ -1,7 +1,7 @@
 <template>
-    <div class="news-small">
+    <div class="news-small" @click="openPopup()">
         <p class="date">{{cDate}}</p>
-        <div class="modpack-info" v-on:click="followModpack">
+        <div class="modpack-badge" v-on:click="followModpack">
             <div :style="cIcon" alt="" class="icon"></div>
             <p>{{modpack}}</p>
         </div>
@@ -25,6 +25,9 @@ export default {
     methods: {
         followModpack() {
             this.$router.push(this.modpackTarget);
+        },
+        openPopup() {
+            this.$root.showNews(this.newsId);
         }
     }
 }
@@ -51,40 +54,8 @@ p.date {
     cursor: pointer;
 }
 
-div.modpack-info {
-    display: inline-flex;
-    align-items: center;
-    background-color: rgba(38, 50, 56, 0.19);
-    width: auto;
-    border-radius: 4px;
+div.modpack-badge {
     margin-bottom: .4rem;
-    cursor: pointer;
-    transition: background-color .2s;
-}
-
-div.modpack-info:hover {
-    background-color: rgba(236, 239, 241, 0.19);
-}
-
-div.modpack-info div.icon {
-    width: 23px;
-    height: 23px;
-    background-size: cover;
-    background-position: center;
-    border-radius: 4px;
-    background-color: rgba(55, 71, 79, 0.25);
-    margin-right: .2rem;
-}
-
-div.modpack-info p {
-    font-weight: 300;
-    color: rgba(255, 255, 255, 0.4);
-    margin-right: .4rem;
-    cursor: pointer;
-    font-size: .8rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
 }
 
 h5 {
@@ -102,7 +73,7 @@ h5 {
 p.content {
     background-color: rgba(255, 255, 255, 0.14);
     padding: .3rem;
-    border-radius: 2px;
+    border-radius: 3px;
     font-weight: 300;
     color: rgba(255, 255, 255, 0.75);
     cursor: pointer;
