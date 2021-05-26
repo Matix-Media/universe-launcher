@@ -2,8 +2,8 @@
     <div class="splash" :class="{ done: isDone }">
         <div class="box">
             <div class="logo">
-                <img src="@/assets/images/branding/icon.svg" class="icon" alt="">
-                <img src="@/assets/images/branding/logo_text.png" alt="">
+                <img src="@/assets/images/branding/icon.svg" class="icon" style="width:5rem;" alt="">
+                <img src="@/assets/images/branding/logo_text.png" style="width:18.106rem;" alt="">
             </div>
 
             <div class="text">
@@ -13,21 +13,28 @@
 
             <span :style="{ width: progress + '%' }"></span>
         </div>
+        <modal v-if="errorText != ''" title="Error" width="20rem" :buttons="[{text: 'OK', 'emit': 'clicked'}]" v-on:clicked="buttonClick.set(true)">
+            {{errorText}}
+        </modal>
     </div>
 </template>
 
 <script>
-//import ipcRenderer from "electron"
-const { ipcRenderer } = require("electron")
+import Modal from "../components/Modal.vue";
+import { ipcRenderer } from "electron";
+import ReactiveVar from "../classes/ReactiveVar";
 
 export default {
     name: "Splash",
+    components: {Modal},
     data() {
         return {
             loadingText: "Preparing rockets...",
             progress: 0,
             version: "...",
-            isDone: false
+            isDone: false,
+            errorText: "",
+            buttonClick: null
         }
     },
     methods: {
@@ -51,27 +58,42 @@ export default {
 
 
             return bytes.toFixed(dp) + ' ' + units[u];
+        },
+        timeout(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
     },
-    mounted() {
+    async mounted() {
         this.$nextTick(() => {
             ipcRenderer.send("app_version")
             ipcRenderer.on("app_version", (event, args) => {
-            const installedVersion = args.version
-            this.version = installedVersion
-            console.log("Installed version: " + installedVersion)
+                const installedVersion = args.version
+                this.version = installedVersion
 
-                setTimeout(() => {
+                setTimeout(async () => {
                     // Checking API status
-                    this.loadingText = "Checking servers..."
+                    this.loadingText = "Phoneing home..."
                     this.progress = 10
+                    try {
+                        var res = await this.$api.checkConnection();
+                        console.log("Successfully connected to API. Status: " + res.status);
+                        if (this.$api.versionCompare(installedVersion, res.requiredClientVersion) >= 0) {
+                            console.log(`Installed version OK. No update required (Client: ${installedVersion}, Required: ${res.requiredClientVersion}).`)
+                        } else {
+                            console.warn(`Client outdated! This can cause problems when using the API (Client: ${installedVersion}, Required: ${res.requiredClientVersion}).`)
+                        }
+                    } catch (err) {
+                        console.warn("Can not reach API. Locale storage-use only!");
+                        this.loadingText = "Can't reach API! You can only play installed modpacks.";
+                        await this.timeout(1000);
+                    }
 
                     // Checking for updates
                     this.loadingText = "Checking for updates..."
                     this.progress = 23
 
                     ipcRenderer.send("check_updates");
-                    ipcRenderer.on("update_info", (event, args) => {
+                    ipcRenderer.on("update_info", async (event, args) => {
                         if (args.updateAvailable) {
                             console.log("Update available!");
                             this.loadingText = "Downloading updates..."
@@ -86,26 +108,71 @@ export default {
                                 }, 1000);
                             })
                         } else {
-                            console.log("No update available");
+                            console.log("No update available (" + installedVersion + ")");
 
                             // Reading configs
                             this.loadingText = "Loading library..."
                             this.progress = 40
+                            try {
+                                await this.$api.loadLibrary();
+                                console.log("Library loaded");
+                            } catch (err) {
+                                console.error("Error loading library", err);
+                                await new Promise((resolve) => {
+                                    this.buttonClick = new ReactiveVar(false, () => {
+                                        this.errorText = "";
+                                        resolve();
+                                    });
+                                    this.errorText = "Error loading library: " + err;
+                                });
+                            }
 
                             this.loadingText = "Loading sessions..."
-                            this.progress = 46
+                            this.progress = 44
+                            await this.$api.loadSessions()
+                            console.log("Sessions loaded")
 
                             this.loadingText = "Loading config..."
                             this.progress = 48
+                            try {
+                                await this.$api.loadConfig();
+                                console.log("Config loaded");
+                            } catch(err) {
+                                console.error("Error loading config", err);
+                                await new Promise((resolve) => {
+                                this.buttonClick = new ReactiveVar(false, () => {
+                                    this.errorText = "";
+                                    resolve();
+                                });
+                                this.errorText = "Error loading config: " + err;
+                            });
+                            }
 
                             // Checking saved accounts
-                            this.loadingText = "Syncing profiles..."
-                            this.progress = 50
+                            this.loadingText = "Syncing profiles...";
+                            this.progress = 75;
+                            try {
+                                await this.$api.loadProfiles();
+                                console.log("Profiles loaded");
+                            } catch (err) {
+                                console.error("Error loading profiles", err);
+                                await new Promise((resolve) => {
+                                    this.buttonClick = new ReactiveVar(false, () => {
+                                        this.errorText = "";
+                                        resolve();
+                                    });
+                                    this.errorText = "Error loading profiles: " + err;
+                                });
+                            }
 
                             // Ready!
-                            this.loadingText = "Ready to discover new universe!"
-                            this.progress = 100
-                            this.isDone = true
+                            this.loadingText = "Ready to discover new universe!";
+                            this.progress = 100;
+                            
+                            this.isDone = true;
+                            setTimeout(() => {
+                                this.$emit("loaded")
+                            }, 1000)
 
                             setTimeout(() => {
                                 this.$emit("done")
