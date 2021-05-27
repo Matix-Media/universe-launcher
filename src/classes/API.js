@@ -33,6 +33,7 @@ export default class API {
             mods: {},
         },
         home: null,
+        library: {},
         discovery: null,
         newsArticles: {},
     };
@@ -45,6 +46,7 @@ export default class API {
             mods: {},
         },
         home: null,
+        library: {},
         discovery: null,
         newsArticles: {},
     };
@@ -143,6 +145,7 @@ export default class API {
                 var id = elem["ID"];
                 this.library[elem["ID"]] = elem;
                 mpInfo["game_version"] = mpInfo.gameVersion;
+                mpInfo["version_release_date"] = mpInfo.versionReleaseDate;
                 this.#cache.modpacks.offlineModpacks[elem.ID] = mpInfo;
 
                 try {
@@ -355,6 +358,61 @@ export default class API {
                 }
             }
         });
+    }
+
+    async getLibrary(order = "alphabetical", query = null) {
+        var result = [];
+        var library = Object.keys(this.library);
+        var id;
+        if (this.offlineMode) {
+            for (id of library) {
+                if (this.#cache.modpacks.offlineModpacks[id]) {
+                    result.push(this.#cache.modpacks.offlineModpacks[id]);
+                }
+            }
+        } else {
+            var needRequest = [];
+            for (id of library) {
+                if (this.#cache.library[id]) {
+                    result.push(this.#cache.library[id]);
+                } else {
+                    needRequest.push(id);
+                }
+            }
+            if (needRequest.length > 0) {
+                var req = await axios.post(apiUrl + "/modpacks", {
+                    modpacks: needRequest,
+                });
+                for (var elem of req.data) {
+                    this.#cache.library[elem.ID] = elem;
+                }
+                result.push(...req.data);
+            }
+        }
+        result.sort((a, b) => {
+            switch (order.toLowerCase()) {
+                default:
+                case "alphabetical":
+                    if (a.name < b.name) return -1;
+                    if (a.name > b.name) return 1;
+                    return 0;
+                case "release date":
+                    var aDate = new Date(a.version_release_date);
+                    var bDate = new Date(b.version_release_date);
+                    if (aDate < bDate) return -1;
+                    if (aDate > bDate) return 1;
+                    return 0;
+            }
+        });
+        if (query) {
+            result = result.filter((elem) => {
+                return elem.name
+                    .toLowerCase()
+                    .trim()
+                    .includes(query.toLowerCase().trim());
+            });
+        }
+        return result;
     }
 
     getDiscovery() {

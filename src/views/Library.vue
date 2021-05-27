@@ -1,17 +1,46 @@
 <template>
     <div class="library">
-        <div class="filter-top-bar">
-            <div class="control-group">
-                <p class="description">Order by:</p>
-                <dropdown class="control" :options="['Alphabetical', 'Relevance', 'Release date']" default="Alphabetical" />
+        <div class="skeleton-loader" v-if="isLoading">
+            <div style="margin: 4.5rem 2rem;display:flex;">
+                <div class="sk-bg" style="height:20.5rem;width:13rem;margin-right:1rem;">
+                    <div class="sk" style="width:7rem;height:1.2rem;margin-top:17.25rem;margin-left:.5rem;"></div>
+                    <div class="sk" style="height:1rem;width:4rem;margin-left:.5rem;margin-top:.5rem;"></div>
+                </div>
+                <div class="sk-bg" style="height:20.5rem;width:13rem;margin-right:1rem;">
+                    <div class="sk" style="width:7rem;height:1.2rem;margin-top:17.25rem;margin-left:.5rem;"></div>
+                    <div class="sk" style="height:1rem;width:4rem;margin-left:.5rem;margin-top:.5rem;"></div>
+                </div>
+                <div class="sk-bg" style="height:20.5rem;width:13rem;margin-right:1rem;">
+                    <div class="sk" style="width:7rem;height:1.2rem;margin-top:17.25rem;margin-left:.5rem;"></div>
+                    <div class="sk" style="height:1rem;width:4rem;margin-left:.5rem;margin-top:.5rem;"></div>
+                </div>
+                <div class="sk-bg" style="height:20.5rem;width:13rem;margin-right:1rem;">
+                    <div class="sk" style="width:7rem;height:1.2rem;margin-top:17.25rem;margin-left:.5rem;"></div>
+                    <div class="sk" style="height:1rem;width:4rem;margin-left:.5rem;margin-top:.5rem;"></div>
+                </div>
             </div>
-            <search-box />
         </div>
+        <div class="loaded-page-content" v-show="!isLoading">
+            <div class="filter-top-bar">
+                <div class="control-group">
+                    <p class="description">Order by:</p>
+                    <dropdown class="control" :options="['Alphabetical', 'Relevance', 'Release date']" default="Alphabetical" v-on:input="onOrderChange" />
+                </div>
+                <search-box v-on:submit="onSearchSubmit" />
+            </div>
 
-        <div class="results">
-            <modpack-big image="https://imgur.com/eiuJs3z.png" target="/library/0" name="Survival Default Kit" author="Matix" game-version="1.16.4" />
-            <modpack-big image="https://imgur.com/u1B1co3.png" target="/library/1" name="OptiFine for Forge 1.16.4" author="Matix" game-version="1.16.4" />
+            <div class="results">
+                <modpack-big v-for="modpack in modpacks" :key="modpack.ID" :image="modpack.cover" :target="'/library/' + modpack.ID" :name="modpack.name" :author="modpack.author.name" :gameVersion="modpack.game_version" />
+            </div>
         </div>
+        
+        <modal title="Error" v-if="error.isError" width="28rem" :buttons="[{text: 'Activate offline mode', emit: 'activateOffline'}]"
+            v-on:exitApp="$root.exitApp()"
+            v-on:activateOffline="localOfflineMode = true;render()"
+        >
+            An error occured while loading.<br>
+            {{error.message}}
+        </modal>
     </div>
 </template>
 
@@ -19,10 +48,60 @@
 import Dropdown from '../components/controls/Dropdown.vue'
 import SearchBox from '../components/SearchBox.vue'
 import ModpackBig from '../components/ModpackBig.vue'
+import Modal from "../components/Modal.vue";
 
 export default {
-    components: { Dropdown, SearchBox, ModpackBig },
+    components: { Dropdown, SearchBox, ModpackBig, Modal },
     name: "Library",
+    data() {
+        return {
+            isLoading: true,
+            modpacks: [],
+            query: null,
+            order: "Alphabetical",
+            error: {
+                isError: false,
+                message: ""
+            }
+        }
+    },
+    methods: {
+        onOrderChange(value) {
+            var newVal = null;
+            if (value != "") newVal = value;
+
+            if (newVal != this.order) {
+                this.order = newVal;
+                this.getLibrary(this.order, this.value);
+            }
+        },
+        onSearchSubmit(value) {
+            var newVal = null;
+            if (value != "") newVal = value;
+
+            if (newVal != this.query) {
+                this.query = newVal;
+                this.getLibrary(this.order, this.value);
+            }
+        },
+        async getLibrary() {
+            try {
+                this.isLoading = true;
+                var res = await this.$api.getLibrary(this.order, this.query);
+                this.modpacks = res;
+                this.isLoading = false;
+            } catch (err) {
+                this.error.isError = true;
+                this.error.message = err;
+                console.log("Error loading library:", err);
+            }
+        }
+    },
+    mounted() {
+        this.$nextTick(async () => {
+            await this.getLibrary();
+        });
+    }
 }
 </script>
 
