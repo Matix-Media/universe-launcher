@@ -268,7 +268,7 @@ export default class API {
         }
     }
 
-    getHome() {
+    getHome(localeOfflineMode = false) {
         return new Promise((resolve, reject) => {
             if (this.#cache.home !== null) {
                 resolve(this.#cache.home);
@@ -294,7 +294,7 @@ export default class API {
                     if (!requestedNews.includes(elem)) requestedNews.push(elem);
                 });
 
-                if (this.offlineMode) {
+                if (localeOfflineMode || this.offlineMode) {
                     var resNews = [];
                     var resRecentlyPlayed = [];
                     var resFavorites = [];
@@ -349,7 +349,7 @@ export default class API {
                             this.#cache.home = val;
                             resolve(val);
                         })
-                        .then((err) => {
+                        .catch((err) => {
                             reject(err);
                         });
                 }

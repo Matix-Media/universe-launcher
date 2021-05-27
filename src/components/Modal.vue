@@ -131,4 +131,8 @@ export default {
 .modal-footer button:hover {
     background-color: rgba(53, 66, 75, 0.6);
 }
+
+.modal-footer button:first-child {
+    margin-left: 0;
+}
 </style>

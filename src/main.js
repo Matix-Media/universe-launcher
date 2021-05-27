@@ -4,6 +4,7 @@ import router from "./router";
 import VueLuxon from "vue-luxon";
 import VueMeta from "vue-meta";
 import API from "./classes/API";
+const remote = require("electron").remote;
 
 Vue.use(VueLuxon, {
     output: {
@@ -40,6 +41,9 @@ new Vue({
         },
     },
     methods: {
+        exitApp() {
+            remote.getCurrentWindow().close();
+        },
         async showNews(id) {
             if (this.$root.newsPopup.loading) return;
 
