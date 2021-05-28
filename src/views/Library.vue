@@ -34,7 +34,7 @@
             </div>
         </div>
         
-        <modal title="Error" v-if="error.isError" width="28rem" :buttons="[{text: 'Activate offline mode', emit: 'activateOffline'}]"
+        <modal title="Error" v-if="error.isError" width="28rem" :buttons="[{text: 'Show offline modpacks', emit: 'activateOffline'}]"
             v-on:activateOffline="localOfflineMode = true;getLibrary()"
         >
             An error occurred while loading.<br>

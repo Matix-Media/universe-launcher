@@ -80,7 +80,7 @@
         </div>
         <modal title="Error" v-if="error.isError" width="28rem" :buttons="[
             {text: 'Close UNIVERSE Launcher', emit: 'exitApp'}, 
-            {text: 'Activate offline mode', emit: 'activateOffline'}
+            {text: 'Show offline modpacks', emit: 'activateOffline'}
         ]"
         v-on:exitApp="$root.exitApp()"
         v-on:activateOffline="localOfflineMode = true;render()"
