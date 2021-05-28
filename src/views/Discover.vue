@@ -1,88 +1,59 @@
 <template>
     <div class="discover">
-        <div class="content">
-            <carousel :slides="[
-                {
-                    modpack: 'Survival Default Kit', 
-                    title: 'Improved Survival experience', 
-                    icon: 'https://imgur.com/eiuJs3z.png', 
-                    banner: 'https://imgur.com/43RMwht.png', 
-                    category: 'New Modpack', 
-                    text: 'Optimize your survival gameplay with this great modpack!',
-                    button: 'Play now',
-                    target: '/discover/0/'
-                }, 
-                {
-                    modpack: 'OptiFine for Forge 1.16.4', 
-                    title: 'Get the best visuals out of Minecraft', 
-                    icon: 'https://imgur.com/u1B1co3.png', 
-                    banner: 'https://images-eu.ssl-images-amazon.com/images/I/91i55nLc-7L.jpg', 
-                    category: 'New Modpack', 
-                    text: 'Tune up your game with the OptiFine extension. Get the best visual experience out of Minecraft!',
-                    button: 'Learn more',
-                    target: '/discover/1/'
-                },
-                {
-                    modpack: 'Star Wars: Conquest', 
-                    title: 'A galaxy far, far away meets Minecraft', 
-                    icon: 'https://prodigits.co.uk/thumbs/wallpapers/p2/movies/44/e7a519c412482820.jpg', 
-                    banner: 'https://cdn.technicpack.net/platform2/pack-backgrounds/1361984.jpg?1610551623', 
-                    category: 'New Modpack', 
-                    text: 'Travel to new worlds, complete quests, forge your own lightsabers, and build your own ship as you explore a galaxy far, far away!',
-                    button: 'Discover the Galaxy',
-                    target: '/discover/2/'
-                },
-                {
-                    modpack: 'Minecraft SKY', 
-                    title: 'Skyblock but different', 
-                    icon: 'https://i.ytimg.com/vi/Q3xWKeOjBnA/maxresdefault.jpg', 
-                    banner: 'https://cdn.hipwallpaper.com/i/58/60/IGaW4g.jpg', 
-                    category: 'New Modpack', 
-                    text: 'Just a tree. That is all you get to build up your own steampunk empire in the skies!',
-                    button: 'Try now',
-                    target: '/discover/3/'
-                },
-                {
-                    modpack: 'RL Craft',
-                    title: 'The most extreme pack!',
-                    icon: 'https://imgur.com/1LKTVsX.png',
-                    banner: 'https://assets.gamepur.com/wp-content/uploads/2020/10/23142934/RLCraft.jpg',
-                    category: 'New Modpack',
-                    text: 'You want Ultra-Hardcore-Minecraft? Then RL Craft is perfect for your desires.',
-                    button: 'Get Real',
-                    target: '/discover/4/'
-                }
-            ]" />
+        <div class="skeleton-loader" v-if="isLoading">
 
-                <header-list title="New Modpacks" class="new list" height="21rem">
-                    <modpack-big image="https://imgur.com/u1B1co3.png" target="/discover/1" name="OptiFine for Forge 1.16.4" author="Matix" game-version="1.16.4" />
-                    <modpack-big image="https://imgur.com/eiuJs3z.png" target="/discover/0" name="Survival Default Kit" author="Matix" game-version="1.16.4" />
-                    <modpack-big image="https://prodigits.co.uk/thumbs/wallpapers/p2/movies/44/e7a519c412482820.jpg" target="/discover/0" name="Star Wars: Conquest" author="Matix" game-version="1.7.10" />
-                    <modpack-big image="https://i.ytimg.com/vi/Q3xWKeOjBnA/maxresdefault.jpg" target="/discover/2" name="Minecraft SKY" author="Matix" game-version="1.7.10" />
-                    <modpack-big image="https://imgur.com/1LKTVsX.png" target="/discover/2" name="RL Craft" author="Matix" game-version="1.12.2" />
-                </header-list>
-
-                <header-list title="Popular Modpacks" class="new list" height="21rem">
-                    <modpack-big image="https://imgur.com/eiuJs3z.png" target="/discover/0" name="Survival Default Kit" author="Matix" game-version="1.16.4" />
-                    <modpack-big image="https://prodigits.co.uk/thumbs/wallpapers/p2/movies/44/e7a519c412482820.jpg" target="/discover/0" name="Star Wars: Conquest" author="Matix" game-version="1.7.10" />
-                    <modpack-big image="https://imgur.com/u1B1co3.png" target="/discover/1" name="OptiFine for Forge 1.16.4" author="Matix" game-version="1.16.4" />
-                    <modpack-big image="https://imgur.com/1LKTVsX.png" target="/discover/2" name="RL Craft" author="Matix" game-version="1.12.2" />
-                    <modpack-big image="https://i.ytimg.com/vi/Q3xWKeOjBnA/maxresdefault.jpg" target="/discover/2" name="Minecraft SKY" author="Matix" game-version="1.7.10" />
-                </header-list>
         </div>
+        <div class="loaded-page-content" v-if="!isLoading">
+            <div class="content">
+                <carousel :slides="data.slides" />
 
+                    <header-list title="New Modpacks" class="new list" height="21rem">
+                        <modpack-big 
+                            v-for="modpack in data.newModpacks" :key="modpack.ID" 
+                            :image="modpack.cover" 
+                            :name="modpack.name" 
+                            :author="modpack.author.name" 
+                            :gameVersion="modpack.game_version" 
+                            :target="'/discover/' + modpack.ID" 
+                        />
+                    </header-list>
+
+                    <header-list title="Popular Modpacks" class="new list" height="21rem">
+                        
+                        <modpack-big 
+                            v-for="modpack in data.popularModpacks" :key="modpack.ID" 
+                            :image="modpack.cover" 
+                            :name="modpack.name" 
+                            :author="modpack.author.name" 
+                            :gameVersion="modpack.game_version" 
+                            :target="'/discover/' + modpack.ID" 
+                        />
+                    </header-list>
+            </div>
+
+            
+            <div class="filter">
+                <search-box />
+                <div class="row">
+                    <p class="description">Order by:</p>
+                    <dropdown class="control" :options="['Alphabetical', 'Relevance', 'Release date']" default="Alphabetical" />
+                </div>
+                <div class="multi-select">
+                    <p class="control">CATEGORIES</p>
+                    <multi-select :options="['Action', 'Adventure', 'Indie', 'RPG', 'Strategie']" />
+                </div>
+            </div>
+        </div>
         
-        <div class="filter">
-            <search-box />
-            <div class="row">
-                <p class="description">Order by:</p>
-                <dropdown class="control" :options="['Alphabetical', 'Relevance', 'Release date']" default="Alphabetical" />
-            </div>
-            <div class="multi-select">
-                <p class="control">CATEGORIES</p>
-                <multi-select :options="['Action', 'Adventure', 'Indie', 'RPG', 'Strategie']" />
-            </div>
-        </div>
+        <modal v-if="error.isError" title="Error" width="20rem" :buttons="[{text: 'Back', emit: 'back'}, {text: 'Home', emit: 'home'}]" 
+            v-on:back="$router.go(-1)" 
+            v-on:home="$router.push({name: 'home'})"
+        >
+            <p class="error-dialog">
+                An error occurred while loading.<br>
+                {{error.message}}
+                </p>
+        </modal>
     </div>
 </template>
 
@@ -93,6 +64,7 @@ import MultiSelect from '../components/controls/MultiSelect.vue'
 import Carousel from '../components/Carousel.vue'
 import ModpackBig from '../components/ModpackBig.vue'
 import HeaderList from "../components/HeaderList.vue"
+import Modal from "../components/Modal.vue";
 
 export default {
     components: { 
@@ -101,9 +73,49 @@ export default {
         MultiSelect,
         Carousel,
         ModpackBig,
-        HeaderList
+        HeaderList,
+        Modal
     },
-    name: "Discover"
+    name: "Discover",
+    data() {
+        return {
+            isLoading: true,
+            data: {
+                slides: [],
+                newModpacks: [],
+                popularModpacks: []
+            },
+            error: {
+                isError: false,
+                message: ""
+            }
+        }
+    },
+    mounted() {
+        this.$nextTick(async () => {
+            try {
+                var result = await this.$api.getDiscover();
+                for (var elem of result.slides) {
+                    this.data.slides.push({
+                        modpack: elem.modpack.name, 
+                        title: elem.title, 
+                        icon: elem.modpack.cover, 
+                        banner: elem.banner, 
+                        category: elem.category, 
+                        text: elem.text,
+                        button: elem.button,
+                        target: '/discover/' + elem.modpack.ID
+                    });
+                }
+                this.data.newModpacks = result.newModpacks;
+                this.data.popularModpacks = result.popularModpacks;
+                this.isLoading = false;
+            } catch (err) {
+                this.error.isError = true;
+                this.error.message = err;
+            }
+        });
+    }
 }
 </script>
 

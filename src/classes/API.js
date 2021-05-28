@@ -426,7 +426,7 @@ export default class API {
                         this.#cache.discover = res.data;
                         resolve(res.data);
                     })
-                    .then((err) => {
+                    .catch((err) => {
                         reject(err);
                     });
             }
