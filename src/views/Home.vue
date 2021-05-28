@@ -85,7 +85,7 @@
         v-on:exitApp="$root.exitApp()"
         v-on:activateOffline="localOfflineMode = true;render()"
         >
-            An error occured while loading.<br>
+            An error occurred while loading.<br>
             {{error.message}}
         </modal>
     </div>
