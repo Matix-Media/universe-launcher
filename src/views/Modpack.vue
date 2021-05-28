@@ -102,7 +102,6 @@
                     <i class="fas fa-ellipsis-h"></i>
                 </a>
             </div>
-
             <div class="content">
                 <router-view class="sub-page"></router-view>
                 <div class="sub-sidebar">
@@ -110,6 +109,7 @@
                     <full-list title="Latest news" class="latest-news" v-if="!$api.offlineMode"></full-list>
                 </div>
             </div>
+            
         </div>
         <modal v-if="isError" title="Error" width="20rem" :buttons="[{text: 'Back', emit: 'back'}, {text: 'Home', emit: 'home'}]" v-on:back="$router.go(-1)" v-on:home="$router.push({name: 'home'})">
             <p class="error-dialog">{{errorMessage}}</p>

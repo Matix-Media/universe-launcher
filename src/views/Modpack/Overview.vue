@@ -42,5 +42,6 @@ export default {
 .description-markdown {
     font-weight: 300;
     font-size: .9rem;
+    padding: .7rem;
 }
 </style>
