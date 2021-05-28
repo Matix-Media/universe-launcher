@@ -34,7 +34,7 @@ export default class API {
         },
         home: null,
         library: {},
-        discovery: null,
+        discover: null,
         newsArticles: {},
     };
     #cache = {
@@ -47,7 +47,7 @@ export default class API {
         },
         home: null,
         library: {},
-        discovery: null,
+        discover: null,
         newsArticles: {},
     };
     offlineMode = false;
@@ -360,11 +360,11 @@ export default class API {
         });
     }
 
-    async getLibrary(order = "alphabetical", query = null) {
+    async getLibrary(order = "alphabetical", query = null, localOfflineMode = false) {
         var result = [];
         var library = Object.keys(this.library);
         var id;
-        if (this.offlineMode) {
+        if (localOfflineMode || this.offlineMode) {
             for (id of library) {
                 if (this.#cache.modpacks.offlineModpacks[id]) {
                     result.push(this.#cache.modpacks.offlineModpacks[id]);
@@ -415,15 +415,15 @@ export default class API {
         return result;
     }
 
-    getDiscovery() {
+    getDiscover() {
         return new Promise((resolve, reject) => {
-            if (this.#cache.discovery !== null) {
-                resolve(this.#cache.discovery);
+            if (this.#cache.discover !== null) {
+                resolve(this.#cache.discover);
             } else {
                 axios
-                    .get(apiUrl + "/discovery")
+                    .get(apiUrl + "/discover")
                     .then((res) => {
-                        this.#cache.discovery = res.data;
+                        this.#cache.discover = res.data;
                         resolve(res.data);
                     })
                     .then((err) => {
