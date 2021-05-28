@@ -35,8 +35,7 @@
         </div>
         
         <modal title="Error" v-if="error.isError" width="28rem" :buttons="[{text: 'Activate offline mode', emit: 'activateOffline'}]"
-            v-on:exitApp="$root.exitApp()"
-            v-on:activateOffline="localOfflineMode = true;render()"
+            v-on:activateOffline="localOfflineMode = true;getLibrary()"
         >
             An error occured while loading.<br>
             {{error.message}}
@@ -56,6 +55,7 @@ export default {
     data() {
         return {
             isLoading: true,
+            localOfflineMode: false,
             modpacks: [],
             query: null,
             order: "Alphabetical",
@@ -86,8 +86,10 @@ export default {
         },
         async getLibrary() {
             try {
+                this.error.isError = false;
+                this.error.message = "";
                 this.isLoading = true;
-                var res = await this.$api.getLibrary(this.order, this.query);
+                var res = await this.$api.getLibrary(this.order, this.query, this.localOfflineMode);
                 this.modpacks = res;
                 this.isLoading = false;
             } catch (err) {
