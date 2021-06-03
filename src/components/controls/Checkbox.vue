@@ -3,7 +3,7 @@
         <p class="checkbox-text">
             {{label}}
         </p>
-        <input class="checkbox-hidden" type="checkbox" :checked="isChecked" :value="value" @change="updateInput">
+        <input class="checkbox-hidden" type="checkbox" v-bind:checked="value" @input="$emit('input', $event.target.checked)">
         <span class="checkmark"></span>
     </label>
 </template>
@@ -11,56 +11,15 @@
 <script>
 export default {
     name: "Checkbox",
-    model: {
-        prop: 'modelValue',
-        event: "change"
-    },
     props: {
         value: {
-            type: String
-        },
-        modelValue: {
-            default: ""
+            type: Boolean
         },
         label: {
             type: String,
             required: true
-        },
-        trueValue: {
-            default: true
-        },
-        falseValue: {
-            default: false
         }
     },
-    computed: {
-        isChecked() {
-            if (this.modelValue instanceof Array) {
-                return this.modelValue.includes(this.value)
-            }
-
-            return this.modelValue == this.trueValue;
-        }
-    },
-    methods: {
-        updateInput(event) {
-            let isChecked = event.target.isChecked
-
-            if (this.modelValue instanceof Array) {
-                let newValue = [...this.modelValue]
-
-                if (isChecked) {
-                    newValue.push(this.value)
-                } else {
-                    newValue.splice(newValue.indexOf(this.value), 1)
-                }
-
-                this.$emit('change', newValue)
-            } else {
-                this.$emit('change', isChecked ? this.trueValue : this.falseValue)
-            }
-        }
-    }
 }
 </script>
 
@@ -102,23 +61,30 @@ input.checkbox-hidden {
     height: 20px;
     width: 20px;
     border: 2px solid #fff;
+    border-radius: 2px;
     background-color: transparent;
-    transition: background-color .2s;
+    transition: background-color .1s, box-shadow .1s;
 }
 
-.checkbox-label:hover input ~ .checkmark,
+.checkbox-label:hover input ~ .checkmark {
+    background-color: rgba(255,255,255,0.26);
+    box-shadow: 0px 0px 5px 1px rgba(255,255,255,0.26);
+}
+
 .checkbox-label input:checked ~ .checkmark {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: #fff;
 }
 
 .checkmark::after {
     content: "";
     position: absolute;
-    display: none;
+    display: block;
+    opacity: 0;
+    transition: opacity .1s;
 }
 
 .checkbox-label input:checked ~ .checkmark::after {
-    display: block;
+    opacity: 1;
 }
 
 .wrapper .checkmark::after {
@@ -126,8 +92,8 @@ input.checkbox-hidden {
     top: 0px;
     width: 5px;
     height: 13px;
-    border: solid white;
-    border-width: 0 3px 3px 0;
+    border: solid #263238;
+    border-width: 0 2px 2px 0;
     transform: rotate(45deg);
 }
 </style>

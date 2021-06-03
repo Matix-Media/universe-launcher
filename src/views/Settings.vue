@@ -1,13 +1,13 @@
 <template>
     <div class="settings">
         <full-list title="Settings">
-            <checkbox label="Throttle Downloads" />
-            <checkbox label="Use proxy" />
+            <checkbox label="Throttle Downloads" v-model="$api.settings.connectivity.throttleDownloads.enabled" />
+            <checkbox label="Use proxy" v-model="$api.settings.connectivity.proxy.enabled" />
         </full-list>
 
         <full-list title="Desktop-Notifications">
-            <checkbox label="Display notifications when modpack is ready" />
-            <checkbox label="Display notifications about news" />
+            <checkbox label="Display notifications when modpack is ready" v-model="$api.settings.notifications.modpackReady" />
+            <checkbox label="Display notifications about news" v-model="$api.settings.notifications.news" />
         </full-list>
 
         <full-list title="Others" class="others">
@@ -30,6 +30,7 @@ export default {
     data() {
         return {
             cacheCleared: false,
+            settings: {}
         }
     },
     methods: {
@@ -90,7 +91,8 @@ div.settings {
     text-decoration: none;
     font-size: 14px;
     font-weight: 300;
-    margin: .5rem 1rem;
+    margin: 0px 1rem;
+    padding: .25rem 0;
     transition: color .2s;
 }
 
