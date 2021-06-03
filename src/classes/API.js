@@ -201,8 +201,11 @@ export default class API {
             await fsp.writeFile(
                 paths.config,
                 JSON.stringify({
-                    settings: {
-                        throttleDownloads: false,
+                    connectivity: {
+                        throttleDownloads: {
+                            enabled: false,
+                            throttle: 0,
+                        },
                         proxy: {
                             enabled: false,
                             host: "",
