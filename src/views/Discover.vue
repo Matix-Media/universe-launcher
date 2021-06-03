@@ -1,7 +1,80 @@
 <template>
     <div class="discover">
-        <div class="skeleton-loader" v-if="isLoading">
-
+        <div class="skeleton-loader" style="height:100vh;overflow:hidden;" v-if="isLoading">
+            <div style="display:flex;">
+                <div style="flex:1;margin:1.5rem 1.5rem;">
+                    <div class="sk-bg" style="display:flex;">
+                        <div style="padding:2.5rem;flex:1;">
+                            <div class="sk" style="width:10rem;height:1.2rem;margin-bottom:.5rem;margin-top:10rem;"></div>
+                            <div class="sk" style="width:9rem;height:1.2rem;margin-bottom:.5rem;"></div>
+                            <div class="sk" style="width:12rem;height:1.2rem;margin-bottom:1.5rem;"></div>
+                            <div class="sk" style="width:8rem;height:2rem;"></div>
+                        </div>
+                        <div style="width:15rem;">
+                            <div style="margin:.5rem;display:flex;">
+                                <div class="sk" style="height:7rem;width:5rem;margin-right:.5rem;"></div>
+                                <div>
+                                    <div class="sk" style="width:4.5rem;height:.8rem;margin-bottom:.5rem;margin-top:.5rem;"></div>
+                                    <div class="sk" style="width:6rem;height:.8rem;margin-bottom:.5rem;"></div>
+                                    <div class="sk" style="width:3rem;height:.8rem;margin-bottom:.5rem;"></div>
+                                </div>
+                            </div>
+                            <div style="margin:.5rem;display:flex;">
+                                <div class="sk" style="height:7rem;width:5rem;margin-right:.5rem;"></div>
+                                <div>
+                                    <div class="sk" style="width:4.5rem;height:.8rem;margin-bottom:.5rem;margin-top:.5rem;"></div>
+                                    <div class="sk" style="width:6rem;height:.8rem;margin-bottom:.5rem;"></div>
+                                    <div class="sk" style="width:3rem;height:.8rem;margin-bottom:.5rem;"></div>
+                                </div>
+                            </div>
+                            <div style="margin:.5rem;display:flex;">
+                                <div class="sk" style="height:7rem;width:5rem;margin-right:.5rem;"></div>
+                                <div>
+                                    <div class="sk" style="width:4.5rem;height:.8rem;margin-bottom:.5rem;margin-top:.5rem;"></div>
+                                    <div class="sk" style="width:6rem;height:.8rem;margin-bottom:.5rem;"></div>
+                                    <div class="sk" style="width:3rem;height:.8rem;margin-bottom:.5rem;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex;margin-top:3rem;">
+                        <div class="sk-bg" style="width:12rem;padding:.5rem;margin-right:2rem;">
+                            <div class="sk" style="width:5rem;height:1.1rem;margin-bottom:.3rem;margin-top:13rem;"></div>
+                            <div class="sk" style="width:3rem;height:1.1rem;margin-bottom:.3rem;"></div>
+                        </div>
+                        <div class="sk-bg" style="width:12rem;padding:.5rem;margin-right:2rem;">
+                            <div class="sk" style="width:5rem;height:1.1rem;margin-bottom:.3rem;margin-top:13rem;"></div>
+                            <div class="sk" style="width:3rem;height:1.1rem;margin-bottom:.3rem;"></div>
+                        </div>
+                        <div class="sk-bg" style="width:12rem;padding:.5rem;margin-right:2rem;">
+                            <div class="sk" style="width:5rem;height:1.1rem;margin-bottom:.3rem;margin-top:13rem;"></div>
+                            <div class="sk" style="width:3rem;height:1.1rem;margin-bottom:.3rem;"></div>
+                        </div>
+                        <div class="sk-bg" style="width:12rem;padding:.5rem;margin-right:2rem;">
+                            <div class="sk" style="width:5rem;height:1.1rem;margin-bottom:.3rem;margin-top:13rem;"></div>
+                            <div class="sk" style="width:3rem;height:1.1rem;margin-bottom:.3rem;"></div>
+                        </div>
+                    </div><div style="display:flex;margin-top:5rem;">
+                        <div class="sk-bg" style="width:12rem;padding:.5rem;margin-right:2rem;">
+                            <div class="sk" style="width:5rem;height:1.1rem;margin-bottom:.3rem;margin-top:13rem;"></div>
+                            <div class="sk" style="width:3rem;height:1.1rem;margin-bottom:.3rem;"></div>
+                        </div>
+                        <div class="sk-bg" style="width:12rem;padding:.5rem;margin-right:2rem;">
+                            <div class="sk" style="width:5rem;height:1.1rem;margin-bottom:.3rem;margin-top:13rem;"></div>
+                            <div class="sk" style="width:3rem;height:1.1rem;margin-bottom:.3rem;"></div>
+                        </div>
+                        <div class="sk-bg" style="width:12rem;padding:.5rem;margin-right:2rem;">
+                            <div class="sk" style="width:5rem;height:1.1rem;margin-bottom:.3rem;margin-top:13rem;"></div>
+                            <div class="sk" style="width:3rem;height:1.1rem;margin-bottom:.3rem;"></div>
+                        </div>
+                        <div class="sk-bg" style="width:12rem;padding:.5rem;margin-right:2rem;">
+                            <div class="sk" style="width:5rem;height:1.1rem;margin-bottom:.3rem;margin-top:13rem;"></div>
+                            <div class="sk" style="width:3rem;height:1.1rem;margin-bottom:.3rem;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sk-bg" style="height:100vh;width:15rem;border-radius:0;"></div>
+            </div>
         </div>
         <div class="loaded-page-content" v-if="!isLoading">
             <div class="content">
@@ -120,7 +193,7 @@ export default {
 </script>
 
 <style scoped>
-div.discover {
+div.loaded-page-content {
     padding-right: 15rem;
 }
 
