@@ -28,6 +28,8 @@ async function createWindow(args) {
         bounds = {
             width: 1420,
             height: 820,
+            x: 20,
+            y: 20,
         };
     }
     // Create the browser window.
