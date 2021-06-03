@@ -157,7 +157,7 @@ export default class API {
 
                     var _sessions = [];
                     sessionsFile.forEach((session) => {
-                        _sessions.push({ modpack: id, ...session });
+                        _sessions.push({ modpack: id, cover: elem["cover"], ...session });
                     });
                     this.sessions.push(..._sessions);
                 } catch (err) {
