@@ -157,7 +157,12 @@ export default class API {
 
                     var _sessions = [];
                     sessionsFile.forEach((session) => {
-                        _sessions.push({ modpack: id, cover: elem["cover"], ...session });
+                        _sessions.push({
+                            modpack: id,
+                            name: mpInfo["name"],
+                            cover: mpInfo["cover"],
+                            ...session,
+                        });
                     });
                     this.sessions.push(..._sessions);
                 } catch (err) {
@@ -219,6 +224,10 @@ export default class API {
                 })
             );
         }
+    }
+
+    async saveConfig() {
+        await fsp.writeFile(paths.config, JSON.stringify(this.settings));
     }
 
     async loadProfiles() {
