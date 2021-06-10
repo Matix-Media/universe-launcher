@@ -1,13 +1,27 @@
 <template>
     <div class="settings">
         <full-list title="Settings">
-            <checkbox label="Throttle Downloads" v-model="$api.settings.connectivity.throttleDownloads.enabled" />
-            <checkbox label="Use proxy" v-model="$api.settings.connectivity.proxy.enabled" />
+            <checkbox label="Throttle Downloads" v-model="settings.connectivity.throttleDownloads.enabled" v-on:input="saveSettings()" />
+            <div class="sub-settings" v-show="settings.connectivity.throttleDownloads.enabled">
+                <input class="text-box" type="number" min="0" v-model="settings.connectivity.throttleDownloads.throttle"> 
+                <p class="text right">KB/s</p>
+            </div>
+            <checkbox label="Use proxy" v-model="settings.connectivity.proxy.enabled" v-on:input="saveSettings()" />
+            <div class="sub-settings" v-show="settings.connectivity.proxy.enabled">
+                <p class="text left">
+                    Adress:
+                </p>
+                <input type="text" class="text-box" v-model="settings.connectivity.proxy.host" v-on:input="saveSettings()" >
+                <p class="text left right">
+                    Port:
+                </p>
+                <input type="number" class="text-box" min="0" style="width:3rem" v-model="settings.connectivity.proxy.port" v-on:input="saveSettings()" >
+            </div>
         </full-list>
 
         <full-list title="Desktop-Notifications">
-            <checkbox label="Display notifications when modpack is ready" v-model="$api.settings.notifications.modpackReady" />
-            <checkbox label="Display notifications about news" v-model="$api.settings.notifications.news" />
+            <checkbox label="Display notifications when modpack is ready" v-model="settings.notifications.modpackReady" v-on:input="saveSettings()" />
+            <checkbox label="Display notifications about news" v-model="settings.notifications.news" v-on:input="saveSettings()" />
         </full-list>
 
         <full-list title="Others" class="others">
@@ -21,6 +35,7 @@
 <script>
 import FullList from '../components/FullList.vue'
 import Checkbox from '../components/controls/Checkbox.vue'
+import _ from "lodash"
 import { exec } from "child_process";
 const { ipcRenderer } = require("electron")
 
@@ -33,7 +48,15 @@ export default {
             settings: {}
         }
     },
+    mounted() {
+        this.settings = this.$api.settings;
+    },
     methods: {
+        saveSettings: _.debounce(function() {
+            console.log("Saving settings...");
+            this.$api.settings = this.settings;
+            this.$api.saveConfig();
+        }, 1000),
         getCommandLine() {
             switch (process.platform) { 
                 case 'darwin' : return 'open';
@@ -62,6 +85,49 @@ export default {
 <style scoped>
 div.settings {
     padding: 2rem;
+}
+
+.sub-settings {
+    margin-left: .7rem;
+    margin-bottom: 1rem;
+    padding: .5rem .8rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.37);
+}
+
+.sub-settings .text {
+    font-size: 1.2em;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.6);
+    display: inline-block;
+}
+
+.sub-settings .text.right {
+    margin-left: .7rem;
+}
+.sub-settings .text.left {
+    margin-right: .7rem;
+}
+
+.text-box {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 3px;
+    color: white;
+    padding: .3rem;
+    font-family: 'Roboto';
+    font-size: 1.2em;
+    transition: background-color .2s;
+    -webkit-appearance: none;
+    font-weight: 300;
+}
+.text-box::-webkit-outer-spin-button,
+.text-box::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.text-box:focus {
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 .checkbox {
