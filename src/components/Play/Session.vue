@@ -96,14 +96,12 @@ div.info {
 }
 
 .time {
-    width: 3.5rem;
     height: 3.5rem;
     justify-self: flex-end;
     display: flex;
-    justify-content: center;
     align-items: center;
     color: rgba(255, 255, 255, 0.15);
     font-size: 15px;
-    padding-right: .5rem;
+    padding-right: 1rem;
 }
 </style>
