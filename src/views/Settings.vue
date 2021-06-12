@@ -1,13 +1,13 @@
 <template>
-    <div class="settings">
+    <div class="settings" v-if="isLoaded">
         <full-list title="Settings">
             <checkbox label="Throttle Downloads" v-model="settings.connectivity.throttleDownloads.enabled" v-on:input="saveSettings()" />
-            <div class="sub-settings" v-show="settings.connectivity.throttleDownloads.enabled">
+            <div class="sub-settings" v-if="settings.connectivity.throttleDownloads.enabled">
                 <input class="text-box" type="number" min="0" v-model="settings.connectivity.throttleDownloads.throttle"> 
                 <p class="text right">KB/s</p>
             </div>
             <checkbox label="Use proxy" v-model="settings.connectivity.proxy.enabled" v-on:input="saveSettings()" />
-            <div class="sub-settings" v-show="settings.connectivity.proxy.enabled">
+            <div class="sub-settings" v-if="settings.connectivity.proxy.enabled">
                 <p class="text left">
                     Adress:
                 </p>
@@ -44,16 +44,17 @@ export default {
     components: {FullList, Checkbox},
     data() {
         return {
+            isLoaded: false,
             cacheCleared: false,
             settings: {}
         }
     },
     mounted() {
         this.settings = this.$api.settings;
+        this.isLoaded = true;
     },
     methods: {
         saveSettings: _.debounce(function() {
-            console.log("Saving settings...");
             this.$api.settings = this.settings;
             this.$api.saveConfig();
         }, 1000),
