@@ -1,6 +1,11 @@
 <template>
     <div class="full-list">
-        <h4>{{title}}</h4>
+        <div class="header" :class="{'has-content': $slots.header}">
+            {{title}}
+            <div class="header-content" v-if="$slots.header">
+                <slot name="header"></slot>
+            </div>
+        </div>
         <div class="content" :style="{padding: padding}">
             <slot />
         </div>
@@ -28,7 +33,30 @@ div.content {
     overflow: hidden;
 }
 
-h4 {
+.header {
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.75);
     font-size: 1rem;
+}
+
+.header::after {
+    content: '';
+    border-top: 1px solid rgba(69, 90, 100, 0.65);
+    margin-left: 1rem;
+    flex: 1 0 20px;
+}
+
+.header.has-content {
+    display: flex;
+    align-items: center;
+}
+
+div.header-content {
+    margin-left: 1rem;
+    display: flex;
+    align-items: center;
 }
 </style>
