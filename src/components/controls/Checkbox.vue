@@ -63,7 +63,7 @@ input.checkbox-hidden {
     border: 2px solid #fff;
     border-radius: 2px;
     background-color: transparent;
-    transition: background-color .1s, box-shadow .1s;
+    transition: background-color .15s, box-shadow .15s;
 }
 
 .checkbox-label:hover input ~ .checkmark {

@@ -1,6 +1,5 @@
 <template>
-    <transition name="modal">
-        <div class="modal-mask" v-on:click.self="close()">
+        <div class="modal-mask" :class="{closing: isClosing}" v-on:click.self="close()">
             <div class="modal-container" :style="{width: width}">
                 <div class="modal-header">
                     <h3>
@@ -19,7 +18,6 @@
                 </div>
             </div>
         </div>
-    </transition>
 </template>
 
 <script>
@@ -31,10 +29,17 @@ export default {
         buttons: {default: () => []}, 
         closeable: {default: false}
     },
+    data() {
+        return {
+            isClosing: false
+        }
+    },
     methods: {
-        close() {
+        async close() {
             if (this.closeable) {
-                this.$emit("close")
+                this.isClosing = true;
+                await new Promise(resolve => setTimeout(resolve, 100));
+                this.$emit("close");
             }
         }
     }
@@ -54,6 +59,20 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    animation: fadeIn linear .1s;
+}
+.modal-mask.closing {
+    animation: fadeOut linear .1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+@keyframes fadeOut {
+  0% {opacity:1;}
+  100% {opacity:0;display: none;}
 }
 
 .modal-container {
@@ -119,7 +138,6 @@ export default {
     margin-left: 1rem;
     color: white;
     background-color: rgba(53, 66, 75, .9);
-    box-shadow: 1px 4px 10px -1px rgba(0,0,0, .1);
     cursor: pointer;
     font-family: 'Roboto';
     text-transform: uppercase;
