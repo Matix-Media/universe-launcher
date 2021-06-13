@@ -1,11 +1,13 @@
 <template>
     <div class="search-box" :class="{open: open}">
         <i class="fas fa-search" @click="submit"></i>
-        <input placeholder="Search" type="text" @blur="open = false" @focus="open = true" @keyup.enter="submit" v-model="content" />
+        <input placeholder="Search" type="text" @blur="open = false" @focus="open = true" @keyup.enter="submit" @keyup="keypress" v-model="content" />
     </div>
 </template>
 
 <script>
+import _ from "lodash"
+
 export default {
     name: "SearchBox",
     data() {
@@ -14,9 +16,13 @@ export default {
             content: "",
         }
     },
+    computed: {
+        keypress: function() {return _.debounce(this.submit, 1000);}
+    },
     methods: {
         submit() {
             this.$emit("submit", this.content);
+            this.keypress.cancel();
         }
     }
 }
