@@ -1,19 +1,20 @@
 <template>
     <div class="account">
         <div class="info">
-            <img :src="microsoft ? require('../../assets/images/account-types/microsoft-icon.png') : require('../../assets/images/account-types/mojang-icon.png')" alt="">
+            <img :src="'https://crafatar.com/avatars/' + uuid + '?size=32&overlay'" alt="">
             <div class="details">
                 <div class="first-line">
                     <p class="username">{{username}}</p>
-                    <span class="default" :class="{enabled: this.default}">default</span>
+                    <span class="default" :class="{enabled: $api.defaultAccount == id}">default</span>
                 </div>
                 <p class="second-line">
-                    {{microsoft ? "Microsoft" : "Mojang"}} &mdash; {{email}}
+                    {{microsoft ? "Microsoft" : "Mojang"}}
                 </p>
             </div>
         </div>
-        <div class="remove-button">
-            <i class="fas fa-times"></i>
+        <div class="remove-button" :class="{removing: removing}" @click="remove()">
+            <i class="fas fa-times" v-if="!removing"></i>
+            <i class="fas fa-circle-notch fa-spin" v-if="removing"></i>
         </div>
     </div>
 </template>
@@ -24,8 +25,26 @@ export default {
     props: {
         microsoft: Boolean,
         username: String,
-        default: Boolean,
-        email: String
+        uuid: String,
+        id: String
+    },
+    data() {
+        return {
+            removing: false
+        }
+    },
+    methods: {
+        async remove() {
+            if (this.removing) return;
+
+            this.removing = true;
+            try {
+                await this.$api.removeProfile(this.id);
+                this.$emit("removed");
+            } catch (err) {
+                //
+            }
+        }
     }
 }
 </script>
@@ -102,10 +121,17 @@ img {
     background-color: rgba(255, 255, 255, 0.10);
     color: rgba(255, 255, 255, 0.15);
     opacity: 0;
-    transition: opacity .2s;
+    transition: opacity .2s, background-color .1s;
 }
 
 .account:hover .remove-button {
     opacity: 1;
+}
+
+.remove-button.removing {
+    cursor: default;
+    opacity: 1;
+    background-color: rgba(139, 139, 139, 0.5);
+    font-size: 1.2rem;
 }
 </style>

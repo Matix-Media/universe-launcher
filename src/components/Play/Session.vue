@@ -8,7 +8,7 @@
                     <span class="active" :class="{enabled: this.active}">Active</span>
                 </div>
                 <p class="second-line">
-                    {{username}} &mdash; {{email}}
+                    {{username}}
                 </p>
             </div>
         </div>
@@ -28,7 +28,6 @@ export default {
         icon: String,
         active: Boolean,
         username: String,
-        email: String,
         length: String
     }
 }
@@ -53,6 +52,7 @@ img {
     width: 2rem;
     height: 2rem;
     margin-right: .7rem;
+    border-radius: 3px;
 }
 
 div.info {
