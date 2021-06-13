@@ -202,6 +202,15 @@ export default class API {
             var content = await fsp.readFile(paths.config);
             content = JSON.parse(content);
             this.settings = content;
+
+            if (this.settings.connectivity.proxy.enabled) {
+                axios.defaults.proxy = {
+                    host: this.settings.connectivity.proxy.host,
+                    port: this.settings.connectivity.proxy.port,
+                };
+            } else {
+                axios.defaults.proxy = undefined;
+            }
         } catch (err) {
             await fsp.writeFile(
                 paths.config,
@@ -227,59 +236,127 @@ export default class API {
     }
 
     async saveConfig() {
+        if (this.settings.connectivity.proxy.enabled) {
+            axios.defaults.proxy = {
+                host: this.settings.connectivity.proxy.host,
+                port: this.settings.connectivity.proxy.port,
+            };
+        } else {
+            axios.defaults.proxy = undefined;
+        }
         await fsp.writeFile(paths.config, JSON.stringify(this.settings));
+    }
+
+    async addProfile(email, password, microsoft = false) {
+        console.log("Validating account...");
+        if (microsoft) {
+            throw new Error("Microsoft Accounts are not supported yet.");
+        } else {
+            try {
+                var result = await Authenticator.getAuth(email, password);
+                var profile = {
+                    type: "Mojang",
+                    id: result.uuid,
+                    accessToken: result.access_token,
+                    clientToken: result.client_token,
+                    login: result.name,
+                    UUID: result.selected_profile.id,
+                    username: result.selected_profile.name,
+                };
+                this.accounts[profile.id] = profile;
+
+                await fsp.writeFile(
+                    paths.accounts,
+                    JSON.stringify({
+                        accounts: this.accounts,
+                        default: this.defaultAccount,
+                    })
+                );
+                console.log("Account validated.");
+                return result.uuid;
+            } catch (err) {
+                console.log("Incorrect credentials.");
+                return false;
+            }
+        }
+    }
+
+    async removeProfile(id) {
+        console.log("Removing account...");
+        const account = this.accounts[id];
+        await Authenticator.invalidate(account.accessToken, account.clientToken);
+        delete this.accounts[id];
+        await fsp.writeFile(
+            paths.accounts,
+            JSON.stringify({
+                accounts: this.accounts,
+                default: this.defaultAccount,
+            })
+        );
+        console.log("Account removed.");
+    }
+
+    async setDefaultProfile(id) {
+        this.defaultAccount = id;
+        await fsp.writeFile(
+            paths.accounts,
+            JSON.stringify({
+                accounts: this.accounts,
+                default: this.defaultAccount,
+            })
+        );
     }
 
     async loadProfiles() {
         try {
             await fsp.access(paths.accounts, fs.constants.F_OK);
-
-            var content = await fsp.readFile(paths.accounts);
-            content = JSON.parse(content);
-            this.defaultAccount = content.default;
-            Object.entries(content.accounts).forEach(async (entry) => {
-                const [key, value] = entry;
-                console.log("Validating account " + value.username + "...");
-                if (value.type === "Mojang") {
+        } catch (err) {
+            await fsp.writeFile(paths.accounts, JSON.stringify({ accounts: {}, default: null }));
+            return;
+        }
+        var content = await fsp.readFile(paths.accounts);
+        content = JSON.parse(content);
+        this.defaultAccount = content.default;
+        for (const key in content.accounts) {
+            const value = content.accounts[key];
+            console.log("Validating account " + value.username + "...");
+            if (value.type === "Mojang") {
+                try {
                     var response = await Authenticator.validate(
                         value.accessToken,
                         value.clientToken
                     );
+                    this.accounts[key] = value;
+                    console.log("Account validated");
+                } catch (err) {
+                    console.log("Updating tokens...");
+                    response = await Authenticator.refreshAuth(
+                        value.accessToken,
+                        value.clientToken
+                    );
+                    console.log("Token refreshed");
                     if (response) {
+                        value["accessToken"] = response.access_token;
+                        value["clientToken"] = response.client_token;
+                        value["UUID"] = response.uuid;
+                        value["username"] = response.name;
                         this.accounts[key] = value;
+                        content.accounts[key] = value;
+
+                        await fsp.writeFile(paths.accounts, JSON.stringify(content));
+
                         console.log("Account validated");
                     } else {
-                        console.log("Updating tokens...");
-                        response = await Authenticator.refreshAuth(
-                            value.accessToken,
-                            value.clientToken,
-                            { id: value.id, username: value.username }
+                        throw new Error(
+                            "Unknown error occurred when refreshing Account information."
                         );
-                        if (response) {
-                            value["accessToken"] = response.access_token;
-                            value["clientToken"] = response.client_token;
-                            value["UUID"] = response.uuid;
-                            value["username"] = response.name;
-                            this.accounts[key] = value;
-                            content.accounts[key] = value;
-
-                            await fsp.writeFile(paths.accounts, JSON.stringify(content));
-
-                            console.log("Account validated");
-                        } else {
-                            throw new Error(
-                                "Unknown error occurred when refreshing Account information."
-                            );
-                        }
                     }
-                } else if (value.type === "Xbox") {
-                    throw new Error("Microsoft Accounts are not support yet.");
-                } else {
-                    throw new Error("Unknown Account type: " + value.type);
                 }
-            });
-        } catch (err) {
-            await fsp.writeFile(paths.accounts, JSON.stringify({ accounts: {}, default: null }));
+            } else if (value.type === "Xbox") {
+                throw new Error("Microsoft Accounts are not support yet.");
+            } else {
+                throw new Error("Unknown Account type: " + value.type);
+            }
         }
     }
 
