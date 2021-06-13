@@ -1,6 +1,6 @@
 <template>
         <div class="modal-mask" :class="{closing: isClosing}" v-on:click.self="close()">
-            <div class="modal-container" :style="{width: width}">
+            <div class="modal-container" :style="{width: width}" :class="{'height-animation': heightAnimation}">
                 <div class="modal-header">
                     <h3>
                         {{ title }}
@@ -10,11 +10,11 @@
                         <i v-if="closeable" @click="close()" class="close-button fas fa-times"></i>
                     </div>
                 </div>
-                <div class="modal-content">
+                <div class="modal-content" :style="contentStyle">
                     <slot></slot>
                 </div>
                 <div class="modal-footer" v-if="buttons.length > 0">
-                    <button v-for="button in buttons" :key="button.text" @click="$emit(button.emit)">{{ button.text }}</button>
+                    <button v-for="button in buttons" :key="button.text" @click="$emit(button.emit)" :class="{primary: button.primary}">{{ button.text }}</button>
                 </div>
             </div>
         </div>
@@ -25,9 +25,11 @@ export default {
     name: "Modal",
     props: {
         title: {default: ""}, 
-        width: {default: "50%"}, 
+        width: {default: "50%"},
+        heightAnimation: {default: false},
         buttons: {default: () => []}, 
-        closeable: {default: false}
+        closeable: {default: false},
+        contentStyle: {default: () => {}}
     },
     data() {
         return {
@@ -148,6 +150,14 @@ export default {
 
 .modal-footer button:hover {
     background-color: rgba(53, 66, 75, 0.6);
+}
+
+.modal-footer button.primary {
+    background-color: rgba(41, 56, 66, 0.9);
+}
+
+.modal-footer button.primary:hover {
+    background-color: rgba(41, 56, 66, 0.6);
 }
 
 .modal-footer button:first-child {
