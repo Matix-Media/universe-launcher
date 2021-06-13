@@ -8,6 +8,10 @@ import path from "path";
 import fs from "fs";
 import electron from "electron";
 import log from "electron-log";
+import fetch from "node-fetch";
+const MSMC = require("./classes/MSMC/microsoft");
+MSMC.setFetch(fetch);
+
 const shell = electron.shell;
 const isDevelopment = process.env.NODE_ENV !== "production";
 const fsp = fs.promises;
@@ -68,10 +72,14 @@ async function createWindow(args) {
 
     win.webContents.on("new-window", function(e, url) {
         // make sure local urls stay in electron perimeter
-        if ("file://" === url.substr(0, "file://".length)) {
+        if (
+            "file://" === url.substr(0, "file://".length) ||
+            url.startsWith("https://login.live.com/")
+        ) {
+            console.log("Nativ window allowed.");
             return;
         }
-
+        console.log("Opening link through shell.");
         // and open every other protocols on the browser
         e.preventDefault();
         shell.openExternal(url);
@@ -99,6 +107,19 @@ async function createWindow(args) {
                 break;
         }
     });
+}
+
+if (app.requestSingleInstanceLock()) {
+    app.on("second-instance", (event, commandLine) => {
+        console.log("Second instance was started with parameters:", commandLine);
+        // Someone tried to run a second instance, we should focus our window.
+        if (win) {
+            if (win.isMinimized()) win.restore();
+            win.focus();
+        }
+    });
+} else {
+    app.exit();
 }
 
 // Quit when all windows are closed.
@@ -205,4 +226,16 @@ ipcMain.on("clear_cache", (event) => {
         console.log("Successfully cleared caches");
         event.sender.send("cleared_cache");
     });
+});
+
+ipcMain.on("login_oauth2_ms", (event) => {
+    MSMC.getElectron().FastLaunch(
+        (call) => {
+            event.sender.send("login_oauth2_ms_callback", call);
+        },
+        (update) => {
+            event.sender.send("login_oauth2_ms_update", update);
+        },
+        "select_account"
+    );
 });

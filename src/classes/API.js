@@ -247,45 +247,77 @@ export default class API {
         await fsp.writeFile(paths.config, JSON.stringify(this.settings));
     }
 
-    async addProfile(email, password, microsoft = false) {
+    async addProfile(type = "mojang", data) {
         console.log("Validating account...");
-        if (microsoft) {
-            throw new Error("Microsoft Accounts are not supported yet.");
-        } else {
-            try {
-                var result = await Authenticator.getAuth(email, password);
-                var profile = {
-                    type: "Mojang",
-                    id: result.uuid,
-                    accessToken: result.access_token,
-                    clientToken: result.client_token,
-                    login: result.name,
-                    UUID: result.selected_profile.id,
-                    username: result.selected_profile.name,
-                };
-                this.accounts[profile.id] = profile;
+        var addedAccountUUID = null;
+        if (type.toLowerCase() == "microsoft") {
+            console.warn(
+                "Microsoft Accounts are not completely supported and may cause some problems."
+            );
+            let profile = {
+                type: "Xbox",
+                id: data.profile.id,
+                accessToken: data.access_token,
+                UUID: data.profile.id,
+                username: data.profile.name,
+            };
+            this.accounts[data.profile.id] = profile;
 
-                await fsp.writeFile(
-                    paths.accounts,
-                    JSON.stringify({
-                        accounts: this.accounts,
-                        default: this.defaultAccount,
-                    })
-                );
-                console.log("Account validated.");
-                return result.uuid;
+            addedAccountUUID = data.profile.id;
+        } else if (type.toLowerCase() == "mojang" || type.toLowerCase() == "xbox") {
+            try {
+                var result = await Authenticator.getAuth(data.email, data.password);
             } catch (err) {
                 console.log("Incorrect credentials.");
                 return false;
             }
+            let profile = {
+                type: "Mojang",
+                id: result.uuid,
+                accessToken: result.access_token,
+                clientToken: result.client_token,
+                login: result.name,
+                UUID: result.selected_profile.id,
+                username: result.selected_profile.name,
+            };
+            this.accounts[profile.id] = profile;
+
+            addedAccountUUID = result.uuid;
+        } else {
+            throw new Error('Account type "' + type + '" is not supported.');
         }
+        if (Object.keys(this.accounts).length == 1) {
+            console.log("Setting as default.");
+            this.defaultAccount = addedAccountUUID;
+        }
+        await fsp.writeFile(
+            paths.accounts,
+            JSON.stringify({
+                accounts: this.accounts,
+                default: this.defaultAccount,
+            })
+        );
+        console.log("Account saved.");
+        return addedAccountUUID;
     }
 
     async removeProfile(id) {
         console.log("Removing account...");
         const account = this.accounts[id];
-        await Authenticator.invalidate(account.accessToken, account.clientToken);
-        delete this.accounts[id];
+        if (account.type.toLowerCase() == "mojang") {
+            await Authenticator.invalidate(account.accessToken, account.clientToken);
+            delete this.accounts[id];
+        } else if (
+            account.type.toLowerCase() == "xbox" ||
+            account.type.toLowerCase() == "microsoft"
+        ) {
+            console.warn(
+                "Microsoft Accounts are not completely supported and may cause some problems."
+            );
+            delete this.accounts[id];
+        } else {
+            throw new Error('Account type "' + account.type + '" is not supported.');
+        }
         await fsp.writeFile(
             paths.accounts,
             JSON.stringify({
@@ -320,7 +352,7 @@ export default class API {
         for (const key in content.accounts) {
             const value = content.accounts[key];
             console.log("Validating account " + value.username + "...");
-            if (value.type === "Mojang") {
+            if (value.type.toLowerCase() === "mojang") {
                 try {
                     var response = await Authenticator.validate(
                         value.accessToken,
@@ -352,10 +384,16 @@ export default class API {
                         );
                     }
                 }
-            } else if (value.type === "Xbox") {
-                throw new Error("Microsoft Accounts are not support yet.");
+            } else if (
+                value.type.toLowerCase() === "xbox" ||
+                value.type.toLowerCase() === "microsoft"
+            ) {
+                this.accounts[key] = value;
+                console.warn(
+                    "Microsoft Accounts are not completely supported and may cause some problems."
+                );
             } else {
-                throw new Error("Unknown Account type: " + value.type);
+                throw new Error('Account type "' + value.type + '" is not supported.');
             }
         }
     }
