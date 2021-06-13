@@ -31,6 +31,7 @@
         "lodash": "^4.17.21",
         "markdown-it-vue": "^1.1.6",
         "minecraft-launcher-core": "^3.16.2",
+        "node-fetch": "^2.6.1",
         "uuid": "^8.3.2",
         "vue": "^2.6.12",
         "vue-luxon": "^0.10.0",
