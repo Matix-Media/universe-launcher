@@ -78,7 +78,7 @@
         </div>
         <div class="loaded-page-content" v-if="!isLoading">
             <div class="content">
-                <carousel :slides="data.slides" />
+                <carousel :slides="data.slides" v-if="data.slides.length > 0" />
 
                     <header-list title="New Modpacks" class="new list" height="21rem">
                         <modpack-big 
