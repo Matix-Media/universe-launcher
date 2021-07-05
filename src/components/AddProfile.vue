@@ -28,8 +28,8 @@
             <button class="login-button" @click="login">{{ loggingIn ? "Logging in..." : "Login" }}</button>
         </div>
         <div v-if="accountType && accountType == 'microsoft' && !loggedIn && msLoginError == null" key="ms-login-screen" class="ms-login-screen">
-            <i class="fas fa-circle-notch fa-spin"></i>
-            <p>{{msLoginProgress == 0 ? "Please login using the popup window." : "Loading..."}}</p>
+            <i class="fas fa-info-circle" v-if="msLoginProgress == 0"></i>
+            <p>{{msLoginProgress == 0 ? "Please login using the popup window." : "Logging in..."}}</p>
             <div class="progress" v-if="msLoginProgress > 0">
                 <span :style="{ width: msLoginProgress + '%' }"></span>
             </div>
@@ -75,17 +75,19 @@ export default {
     methods: {
         async msLogin() {
             ipcRenderer.send("login_oauth2_ms");
-            ipcRenderer.on("login_oauth2_ms_callback", async (event, call) => {
+            ipcRenderer.once("login_oauth2_ms_callback", async (event, call) => {
                 var result = this.$api.addProfile("microsoft", call);
                 this.loggedIn = true;
                 setTimeout(() => this.$emit("loggedIn", result), 1000);
             });
-            ipcRenderer.on("login_oauth2_ms_update", (event, update) => {
+            ipcRenderer.once("login_oauth2_ms_update", (event, update) => {
                 if (update["type"] == "Loading") {
                     this.msLoginProgress = update.percent;
                     console.log("MS-Login (" + update.percent + "%):", update.data);
-                } else if (update.type == "Error") {
+                } else if (update.type == "Error" || update.type == "Rejection") {
                     this.msLoginError = update.data;
+                } else if (update.type == "Cancelled") {
+                    this.msLoginError = "Login cancelled.";
                 }
             });
         },

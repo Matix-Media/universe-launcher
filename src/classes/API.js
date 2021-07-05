@@ -4,6 +4,8 @@ import { ipcRenderer } from "electron";
 import fs from "fs";
 import path from "path";
 import { Authenticator } from "minecraft-launcher-core";
+import MSMC from "msmc";
+
 const fsp = fs.promises;
 
 ("strict mode");
@@ -250,21 +252,24 @@ export default class API {
     async addProfile(type = "mojang", data) {
         console.log("Validating account...");
         var addedAccountUUID = null;
-        if (type.toLowerCase() == "microsoft") {
+        if (type.toLowerCase() == "microsoft" || type.toLowerCase() == "xbox") {
             console.warn(
                 "Microsoft Accounts are not completely supported and may cause some problems."
             );
+            console.log(data.profile);
             let profile = {
                 type: "Xbox",
                 id: data.profile.id,
                 accessToken: data.access_token,
+                refreshToken: data.profile._msmc.refresh,
+                expires: data.profile._msmc.expires_by,
                 UUID: data.profile.id,
                 username: data.profile.name,
             };
             this.accounts[data.profile.id] = profile;
 
             addedAccountUUID = data.profile.id;
-        } else if (type.toLowerCase() == "mojang" || type.toLowerCase() == "xbox") {
+        } else if (type.toLowerCase() == "mojang") {
             try {
                 var result = await Authenticator.getAuth(data.email, data.password);
             } catch (err) {
@@ -349,6 +354,8 @@ export default class API {
         var content = await fsp.readFile(paths.accounts);
         content = JSON.parse(content);
         this.defaultAccount = content.default;
+
+        var lastThrownError = null;
         for (const key in content.accounts) {
             const value = content.accounts[key];
             console.log("Validating account " + value.username + "...");
@@ -362,11 +369,18 @@ export default class API {
                     console.log("Account validated");
                 } catch (err) {
                     console.log("Updating tokens...");
-                    response = await Authenticator.refreshAuth(
-                        value.accessToken,
-                        value.clientToken
-                    );
-                    console.log("Token refreshed");
+                    try {
+                        response = await Authenticator.refreshAuth(
+                            value.accessToken,
+                            value.clientToken
+                        );
+                    } catch (err) {
+                        console.error("Could not refresh tokens.");
+                        lastThrownError = err;
+                        continue;
+                    }
+
+                    console.log("Tokens refreshed");
                     if (response) {
                         value["accessToken"] = response.access_token;
                         value["clientToken"] = response.client_token;
@@ -379,8 +393,9 @@ export default class API {
 
                         console.log("Account validated");
                     } else {
-                        throw new Error(
-                            "Unknown error occurred when refreshing Account information."
+                        console.error("Could not refresh tokens (Unknown error).");
+                        lastThrownError = new Error(
+                            "Unknown error occurred while refreshing account information."
                         );
                     }
                 }
@@ -388,13 +403,63 @@ export default class API {
                 value.type.toLowerCase() === "xbox" ||
                 value.type.toLowerCase() === "microsoft"
             ) {
-                this.accounts[key] = value;
-                console.warn(
-                    "Microsoft Accounts are not completely supported and may cause some problems."
-                );
+                var valid = MSMC.Validate({ _msmc: { expires_by: value.expires } });
+                if (!valid) {
+                    console.log("Updating tokens...");
+                    try {
+                        await new Promise((resolve, reject) => {
+                            ipcRenderer.send("refresh_oauth2_ms", {
+                                _msmc: { refresh: value.refreshToken },
+                            });
+                            ipcRenderer.once("refresh_oauth2_ms_callback", (event, callback) => {
+                                console.log(callback);
+                                let profile = {
+                                    type: "Xbox",
+                                    id: callback.profile.id,
+                                    accessToken: callback.access_token,
+                                    refreshToken: callback.profile._msmc.refresh,
+                                    expires: callback.profile._msmc.expires_by,
+                                    UUID: callback.profile.id,
+                                    username: callback.profile.name,
+                                };
+
+                                this.accounts[key] = profile;
+                                content.accounts[key] = profile;
+
+                                resolve();
+                            });
+                            var updateEvent = ipcRenderer.on(
+                                "refresh_oauth2_ms_update",
+                                (event, update) => {
+                                    if (
+                                        update.type == "Rejection" ||
+                                        update.type == "Error" ||
+                                        update.type == "Cancelled"
+                                    ) {
+                                        reject();
+                                        updateEvent.removeAllListeners();
+                                    }
+                                }
+                            );
+                        });
+                        await fsp.writeFile(paths.accounts, JSON.stringify(content));
+
+                        console.log("Tokens refreshed");
+                    } catch (err) {
+                        console.error("Could not refresh tokens.");
+                        lastThrownError = err;
+                        continue;
+                    }
+                } else {
+                    console.log("Account validated");
+                    this.accounts[key] = value;
+                }
             } else {
-                throw new Error('Account type "' + value.type + '" is not supported.');
+                lastThrownError = new Error('Account type "' + value.type + '" is not supported.');
             }
+        }
+        if (lastThrownError != null) {
+            throw lastThrownError;
         }
     }
 

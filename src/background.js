@@ -9,7 +9,9 @@ import fs from "fs";
 import electron from "electron";
 import log from "electron-log";
 import fetch from "node-fetch";
-const MSMC = require("./classes/MSMC/microsoft");
+//const MSMC = require("msmc");
+import MSMC from "msmc";
+//const MSMC = require("./classes/MSMC/microsoft");
 MSMC.setFetch(fetch);
 
 const shell = electron.shell;
@@ -237,5 +239,17 @@ ipcMain.on("login_oauth2_ms", (event) => {
             event.sender.send("login_oauth2_ms_update", update);
         },
         "select_account"
+    );
+});
+
+ipcMain.on("refresh_oauth2_ms", (event, args) => {
+    MSMC.MSRefresh(
+        args,
+        (callback) => {
+            event.sender.send("refresh_oauth2_ms_callback", callback);
+        },
+        (update) => {
+            event.sender.send("refresh_oauth2_ms_update", update);
+        }
     );
 });
