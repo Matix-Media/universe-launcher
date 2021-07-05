@@ -93,7 +93,7 @@ export default {
                     this.progress = 23
 
                     ipcRenderer.send("check_updates");
-                    ipcRenderer.on("update_info", async (event, args) => {
+                    ipcRenderer.once("update_info", async (event, args) => {
                         if (args.updateAvailable) {
                             console.log("Update available!");
                             this.loadingText = "Downloading updates..."
@@ -101,7 +101,7 @@ export default {
                                 this.progress = args.percent;
                                 this.loadingText = "Downloading updates... (" + this.humanFileSize(args.bytesPerSecond, true) + "/s)"
                             })
-                            ipcRenderer.on("update_downloaded", () => {
+                            ipcRenderer.once("update_downloaded", () => {
                                 this.loadingText = "Update downloaded. Restarting..."
                                 setTimeout(() => {
                                     ipcRenderer.send("restart_app")
@@ -149,11 +149,11 @@ export default {
                             }
 
                             // Checking saved accounts
-                            this.loadingText = "Syncing profiles...";
+                            this.loadingText = "Syncing accounts...";
                             this.progress = 75;
                             try {
                                 await this.$api.loadProfiles();
-                                console.log("Profiles loaded");
+                                console.log("Accounts loaded");
                             } catch (err) {
                                 console.error("Error loading profiles", err);
                                 await new Promise((resolve) => {
@@ -179,7 +179,7 @@ export default {
                             }, 2000)
                         }
                     })
-                }, 1000)
+                }, 1500)
             })
         })
     }
@@ -208,6 +208,9 @@ div.box {
     background-color: rgba(255, 255, 255, 0.05);
     box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.03);
     border-radius: 4px;
+    
+    animation-delay: .5s;
+    animation: fadeIn ease-in-out 1s;
 }
 
 div.logo {
@@ -290,6 +293,12 @@ div.splash.done {
     100% {
         transform: rotate(360deg);
     }
+}
+
+
+@keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
 }
 
 @keyframes fadeout {
