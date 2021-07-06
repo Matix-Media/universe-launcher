@@ -1,4 +1,4 @@
-https://img.shields.io/github/downloads/Matix-Media/universe-launcher/latest/total?style=for-the-badge
+![GitHub release (latest by date)](https://img.shields.io/github/downloads/Matix-Media/universe-launcher/latest/total?style=for-the-badge)  
 
 # UNIVERSE Launcher
 
