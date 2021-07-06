@@ -1,3 +1,5 @@
+https://img.shields.io/github/downloads/Matix-Media/universe-launcher/latest/total?style=for-the-badge
+
 # UNIVERSE Launcher
 
 This launcher was originally named matixs-mod-installer-rn
