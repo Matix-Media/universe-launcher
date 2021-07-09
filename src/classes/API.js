@@ -26,19 +26,7 @@ ipcRenderer.on("user_data_path", (event, args) => {
 });
 
 export default class API {
-    #cache_default = {
-        modpacks: {
-            modpacks: {},
-            offlineModpacks: {},
-            comments: {},
-            news: {},
-            mods: {},
-        },
-        home: null,
-        library: {},
-        discover: null,
-        newsArticles: {},
-    };
+    #cache_default = {};
     #cache = {
         modpacks: {
             modpacks: {},
@@ -60,7 +48,9 @@ export default class API {
     accounts = {};
     defaultAccount = null;
 
-    constructor() {}
+    constructor() {
+        Object.assign(this.#cache_default, this.#cache);
+    }
 
     versionCompare(v1, v2, options) {
         var lexicographical = options && options.lexicographical,
@@ -253,9 +243,6 @@ export default class API {
         console.log("Validating account...");
         var addedAccountUUID = null;
         if (type.toLowerCase() == "microsoft" || type.toLowerCase() == "xbox") {
-            console.warn(
-                "Microsoft Accounts are not completely supported and may cause some problems."
-            );
             console.log(data.profile);
             let profile = {
                 type: "Xbox",
@@ -316,9 +303,6 @@ export default class API {
             account.type.toLowerCase() == "xbox" ||
             account.type.toLowerCase() == "microsoft"
         ) {
-            console.warn(
-                "Microsoft Accounts are not completely supported and may cause some problems."
-            );
             delete this.accounts[id];
         } else {
             throw new Error('Account type "' + account.type + '" is not supported.');
@@ -366,7 +350,7 @@ export default class API {
                         value.clientToken
                     );
                     this.accounts[key] = value;
-                    console.log("Account validated");
+                    console.log("Account is valid");
                 } catch (err) {
                     console.log("Updating tokens...");
                     try {
@@ -391,7 +375,7 @@ export default class API {
 
                         await fsp.writeFile(paths.accounts, JSON.stringify(content));
 
-                        console.log("Account validated");
+                        console.log("Account is valid");
                     } else {
                         console.error("Could not refresh tokens (Unknown error).");
                         lastThrownError = new Error(
