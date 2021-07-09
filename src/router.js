@@ -64,5 +64,17 @@ export default new Router({
             name: "play",
             component: () => import("./views/Play.vue"),
         },
+        {
+            path: "/creator",
+            name: "creator",
+            component: () => import("./views/Creator.vue"),
+            children: [
+                {
+                    path: "",
+                    name: "creator-home",
+                    component: () => import("./views/Creator/Home.vue"),
+                },
+            ],
+        },
     ],
 });
