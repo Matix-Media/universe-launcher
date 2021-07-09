@@ -67,23 +67,39 @@
             <div class="lists">
                 <full-list title="RECENTLY PLAYED">
                     <div class="list-recently-played list">
-                        <modpack-small v-for="modpack in data.recentlyPlayed" :key="modpack.ID" :image="modpack.cover" :target="'/library/' + modpack.ID" />
+                        <tooltip v-for="(modpack, index) in data.recentlyPlayed" :key="modpack.ID" :style="{zIndex: data.recentlyPlayed.length - index}">
+                            <template v-slot:content>
+                                <modpack-small :image="modpack.cover" :target="'/library/' + modpack.ID" />
+                            </template>
+                            <template v-slot:tooltip>
+                                <modpack-tooltip :modpack="modpack" />
+                            </template>
+                        </tooltip>
                     </div>
                 </full-list>
 
                 <full-list title="FAVORITE MODPACKS">
                     <div class="list-your-modpacks list">
-                        <modpack-small v-for="modpack in data.favorites" :key="modpack.ID" :image="modpack.cover" :target="'/library/' + modpack.ID" />
+                        <tooltip v-for="(modpack, index) in data.favorites" :key="modpack.ID" :style="{zIndex: data.favorites.length - index}">
+                            <template v-slot:content>
+                                <modpack-small :image="modpack.cover" :target="'/library/' + modpack.ID" />
+                            </template>
+                            <template v-slot:tooltip>
+                                <modpack-tooltip :modpack="modpack" />
+                            </template>
+                        </tooltip>
                     </div>
                 </full-list>
             </div>
         </div>
         <modal title="Error" v-if="error.isError" width="28rem" :buttons="[
             {text: 'Close UNIVERSE Launcher', emit: 'exitApp'}, 
-            {text: 'Show offline modpacks', emit: 'activateOffline'}
+            {text: 'Offline Mode', emit: 'activateOffline'},
+            {text: 'Retry', emit: 'reload'}
         ]"
         v-on:exitApp="$root.exitApp()"
         v-on:activateOffline="localOfflineMode = true;render()"
+        v-on:reload="render()"
         >
             An error occurred while loading.<br>
             {{error.message}}
@@ -96,6 +112,8 @@ import NewsSmall from '../components/NewsSmall.vue';
 import FullList from '../components/FullList.vue';
 import ModpackSmall from '../components/ModpackSmall.vue';
 import Modal from "../components/Modal.vue";
+import Tooltip from "../components/controls/Tooltip.vue";
+import ModpackTooltip from '../components/ModpackTooltip.vue';
 
 export default {
     name: "Home",
@@ -103,7 +121,9 @@ export default {
         NewsSmall,
         FullList,
         ModpackSmall,
-        Modal
+        Modal,
+        Tooltip,
+        ModpackTooltip
     },
     data() {
         return {
@@ -152,8 +172,8 @@ div.home {
 div.news {
     margin: 0 3rem 0 2rem;
     background-color: rgba(255, 255, 255, 0.19);
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
     backdrop-filter: blur(15px);
     padding: .5rem;
     box-shadow: 1px 4px 9px -1px rgba(0,0,0,0.05);
@@ -171,7 +191,7 @@ div.list {
 div.news div.content div.news-small {
     margin-right: 1.5rem;
 }
-div.modpack-small {
+div.tooltip-box {
     margin-right: 1rem;
 }
 div.lists div.full-list {
