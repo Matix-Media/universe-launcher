@@ -207,6 +207,10 @@ export default class API {
             await fsp.writeFile(
                 paths.config,
                 JSON.stringify({
+                    appearance: {
+                        minimizeOnMcStartup: true,
+                        closeOnMcExit: false,
+                    },
                     connectivity: {
                         throttleDownloads: {
                             enabled: false,

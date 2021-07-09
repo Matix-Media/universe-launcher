@@ -1,6 +1,10 @@
 <template>
     <div class="settings" v-if="isLoaded">
-        <full-list title="Settings">
+        <full-list title="Appearance">
+            <checkbox label="Minimize to system tray after starting the game" v-model="settings.appearance.minimizeOnMcStartup" v-on:input="saveSettings()" />
+            <checkbox label="Close UNIVERSE Launcher when exiting Minecraft" v-model="settings.appearance.closeOnMcExit" v-on:input="saveSettings()" />
+        </full-list>
+        <full-list title="Network">
             <checkbox label="Throttle Downloads" v-model="settings.connectivity.throttleDownloads.enabled" v-on:input="saveSettings()" />
             <div class="sub-settings" v-if="settings.connectivity.throttleDownloads.enabled">
                 <input class="text-box" type="number" min="0" v-model="settings.connectivity.throttleDownloads.throttle"> 
@@ -50,8 +54,10 @@ export default {
         }
     },
     mounted() {
-        this.settings = this.$api.settings;
-        this.isLoaded = true;
+        this.$nextTick(() => {
+            this.settings = this.$api.settings;
+            this.isLoaded = true;
+        });
     },
     methods: {
         saveSettings: _.debounce(function() {
