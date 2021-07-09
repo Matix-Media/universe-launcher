@@ -41,7 +41,7 @@ export default {
 .creator-loaded {
     visibility: hidden;
     opacity: 0;
-    transition: opacity .2s;
+    transition: opacity .5s;
 }
 
 .creator.loaded .creator-loaded {
