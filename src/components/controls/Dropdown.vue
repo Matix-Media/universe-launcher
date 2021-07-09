@@ -90,13 +90,14 @@ export default {
   overflow: hidden;
   position: absolute;
   backdrop-filter: blur(15px);
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgb(48, 61, 68);
+  top: calc(100% + .2rem);
   left: 0;
   right: 0;
   z-index: 1;
   line-height: 2em;
-  box-shadow: 1px 4px 9px -1px rgba(0,0,0,0.05);
-  border-radius: 2px;
+  box-shadow: 1px 4px 9px -1px rgba(0,0,0,0.08);
+  border-radius: 3px;
 }
 
 .custom-select .items div {
