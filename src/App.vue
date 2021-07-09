@@ -259,28 +259,6 @@ div.skeleton-loader .sk-bg::after {
     }
 }
 
-.tooltip {
-  display: block !important;
-  z-index: 10000;
-}
-
-.tooltip .tooltip-inner {
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 4px;
-  color: white;
-  padding: .5rem 1rem .5rem;
-}
-
-.tooltip .tooltip-arrow {
-  width: 0;
-  height: 0;
-  border-style: solid;
-  position: absolute;
-  margin: 5px;
-  border-color: rgba(0, 0, 0, 0.5);
-  z-index: 1;
-}
-
 h1, h2, h3, h4, h5, h6, a, p {
   margin: 0;
   cursor: default;
