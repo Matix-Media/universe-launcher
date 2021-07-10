@@ -1,7 +1,10 @@
 <template>
     <div class="custom-select" :tabindex="tabindex" @blur="open = false">
         <div class="selected" :class="{ open: open }" @click="open = !open">
-        {{ selected }}
+            <p class="text">
+                {{ selected }}
+            </p>
+            <span class="arrow"></span>
         </div>
         <div class="items" :class="{ selectHide: !open }">
             <div
@@ -60,23 +63,30 @@ export default {
 
 .custom-select .selected {
   border-radius: 6px;
-  padding-left: 1em;
-  padding-right: 2.5em;
+  padding: 0 .3rem;
   cursor: pointer;
   user-select: none;
+  display: flex;
+  align-items: center;
 }
 
-.custom-select .selected:after {
-  position: absolute;
-  content: "";
-  top: .5em;
-  right: 1em;
-  width: 0;
-  height: 0;
-  border: 5px solid transparent;
-  border-color: #fff transparent transparent transparent;
-  transition: transform .2s , margin .2s;
-  transition-timing-function: cubic-bezier(0.215, 0.61, 0.353, 1);
+.custom-select .selected p {
+    flex: 1;
+    cursor: pointer;
+}
+
+.custom-select .selected .arrow {
+    margin-left: .5rem;
+    margin-top: 5px;
+    content: "";
+    top: .5em;
+    right: 1em;
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    border-color: #fff transparent transparent transparent;
+    transition: transform .2s , margin .2s;
+    transition-timing-function: cubic-bezier(0.215, 0.61, 0.353, 1);
 }
 
 .custom-select .selected.open:after {
@@ -86,7 +96,6 @@ export default {
 
 .custom-select .items {
   color: #fff;
-  z-index: 999999;
   overflow: hidden;
   position: absolute;
   backdrop-filter: blur(15px);
