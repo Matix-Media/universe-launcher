@@ -6,7 +6,7 @@
                 <slot name="header"></slot>
             </div>
         </div>
-        <div class="content" :style="{padding: padding}">
+        <div class="content" :style="{padding: padding, overflow: overflowHidden ? 'hidden' : 'visible'}">
             <slot />
         </div>
     </div>
@@ -19,6 +19,9 @@ export default {
         title: String,
         padding: {
             default: ".5rem"
+        },
+        overflowHidden: {
+            default: true
         }
     }
 }
@@ -30,7 +33,6 @@ div.content {
     padding: .5rem;
     backdrop-filter: blur(30px);
     background-color: rgba(255, 255, 255, 0.02);
-    overflow: hidden;
 }
 
 .header {
