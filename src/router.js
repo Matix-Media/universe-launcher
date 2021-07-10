@@ -66,13 +66,28 @@ export default new Router({
         },
         {
             path: "/creator",
-            name: "creator",
             component: () => import("./views/Creator.vue"),
             children: [
                 {
                     path: "",
-                    name: "creator-home",
+                    name: "creator",
                     component: () => import("./views/Creator/Home.vue"),
+                },
+
+                {
+                    path: "new",
+                    name: "creator-new",
+                    component: () => import("./views/Creator/New.vue"),
+                },
+                {
+                    path: "new/import",
+                    name: "creator-import",
+                    component: () => import("./views/Creator/Import.vue"),
+                },
+                {
+                    path: "new/clone",
+                    name: "creator-clone",
+                    component: () => import("./views/Creator/Clone.vue"),
                 },
             ],
         },

@@ -2,19 +2,22 @@
     <div class="creator-home">
         <div class="projects-manager">
             <full-list title="Recent projects" class="recent-projects">
-
+                <p class="no-projects">
+                    You haven't opened any projects.<br> 
+                    Click on one of the buttons on the right to get started.
+                </p>
             </full-list>
             <div class="controls">
-                <button>
+                <router-link :to="{name: 'creator-new'}">
                     <i class="fas fa-file-medical"></i>
                     <div>
                         <p class="name">New Modpack</p>
                         <p class="description">
-                            Create a new Modpack and get started
+                            Create a new modpack and get started
                         </p>
                     </div>
-                </button>
-                <button>
+                </router-link>
+                <router-link :to="{name: 'creator-import'}">
                     <i class="fas fa-file-download"></i>
                     <div>
                         <p class="name">Import</p>
@@ -22,8 +25,8 @@
                             Import a project using a .ulmp file
                         </p>
                     </div>
-                </button>
-                <button>
+                </router-link>
+                <router-link :to="{name: 'creator-clone'}">
                     <i class="fab fa-git-alt"></i>
                     <div>
                         <p class="name">Clone with git</p>
@@ -31,7 +34,7 @@
                             Get a project from an online repository like GitHub
                         </p>
                     </div>
-                </button>
+                </router-link>
             </div>
         </div> 
     </div>
@@ -60,18 +63,24 @@ div.projects-manager {
     flex: 1;
 }
 
+.recent-projects .no-projects {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: .9rem;
+    margin: 1rem;
+    text-align: center;
+}
+
 .controls {
     display: flex;
     flex-direction: column;
-    width: 18rem;
-    margin-left: 3rem;
+    width: 17rem;
+    margin-left: 4rem;
 }
 
-.controls button {
+.controls a {
     border: none;
     border-radius: 4px;
     padding: 1rem 1rem;
-    margin-left: 1rem;
     color: white;
     background-color: rgba(53, 66, 75, .9);
     backdrop-filter: blur(15px);
@@ -84,27 +93,28 @@ div.projects-manager {
     margin-bottom: .5rem;
     text-align: start;
     display: flex;
+    text-decoration: none;
 }
 
-.controls button:hover {
+.controls a:hover {
     background-color: rgba(53, 66, 75, 0.6);
 }
 
-.controls button * {
+.controls a * {
     cursor: pointer;
 }
 
-.controls button i {
+.controls a i {
     font-size: 1.5rem;
     width: 1.5rem;
     margin-right: 1rem;
 }
 
-.controls button .name {
+.controls a .name {
     font-size: 1rem;
 }
 
-.controls button .description {
+.controls a .description {
     text-transform: none;
     color: rgba(255, 255, 255, 0.8);
 }

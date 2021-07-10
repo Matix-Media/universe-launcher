@@ -12,7 +12,7 @@
             </div>
         </div>
 
-        <div class="creator-loaded">
+        <div class="creator-content">
             <router-view v-if="isLoaded" />
         </div>
     </div>
@@ -38,13 +38,13 @@ export default {
 
 <style scoped>
 
-.creator-loaded {
+.creator-content {
     visibility: hidden;
     opacity: 0;
     transition: opacity .5s;
 }
 
-.creator.loaded .creator-loaded {
+.creator.loaded .creator-content {
     opacity: 1;
     visibility: visible;
 }
