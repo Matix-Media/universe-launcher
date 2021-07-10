@@ -4,6 +4,7 @@ import router from "./router";
 import VueLuxon from "vue-luxon";
 import VueMeta from "vue-meta";
 import API from "./classes/API";
+import Creator from "./classes/Creator";
 const remote = require("electron").remote;
 
 Vue.use(VueLuxon, {
@@ -17,6 +18,7 @@ Vue.use(VueMeta);
 Vue.config.productionTip = false;
 
 Vue.prototype.$api = new API();
+Vue.prototype.$creator = new Creator();
 
 new Vue({
     router,
