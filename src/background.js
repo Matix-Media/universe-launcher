@@ -1,6 +1,6 @@
 "use strict";
 
-import { app, protocol, BrowserWindow, ipcMain } from "electron";
+import { app, protocol, BrowserWindow, ipcMain, dialog } from "electron";
 import { autoUpdater } from "electron-updater";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
@@ -176,8 +176,21 @@ if (isDevelopment) {
 
 // IPC Remote events
 
+ipcMain.on("open-file-dialog", async (event, args) => {
+    try {
+        let files = await dialog.showOpenDialog(win, args);
+        event.sender.send("open-file-dialog_result", files);
+    } catch (err) {
+        event.sender.send("open-file-dialog_result", { canceled: true });
+        console.error(err);
+    }
+});
+
 ipcMain.on("user_data_path", (event) => {
-    event.sender.send("user_data_path", { userData: app.getPath("userData") });
+    event.sender.send("user_data_path", {
+        userData: app.getPath("userData"),
+        documents: app.getPath("documents"),
+    });
 });
 
 ipcMain.on("log_path", (event) => {
