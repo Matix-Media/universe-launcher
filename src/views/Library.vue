@@ -109,6 +109,8 @@ export default {
 
 <style scoped>
 .filter-top-bar {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -151,7 +153,8 @@ div.results {
     align-content: top;
     margin: 2rem;
     margin-top: 2rem;
-    z-index: -1;
+    position: relative;
+    z-index: 0;
 }
 
 div.results div.modpack-big {

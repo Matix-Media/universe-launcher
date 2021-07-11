@@ -1,7 +1,7 @@
 <template>
         <div class="modal-mask" :class="{closing: isClosing}" v-on:click.self="close()">
             <div class="modal-container" :style="{width: width}" :class="{'height-animation': heightAnimation}">
-                <div class="modal-header">
+                <div class="modal-header" v-if="title != '' || $slots.header">
                     <h3>
                         {{ title }}
                     </h3>
@@ -78,7 +78,6 @@ export default {
 }
 
 .modal-container {
-    padding-top: 1rem;
     background-color: rgba(47, 54, 61, 0.50);
     backdrop-filter: blur(15px);
     border-radius: 4px;
@@ -89,7 +88,9 @@ export default {
 }
 
 .modal-header {
+    padding-top: 1rem;
     margin: 0 1rem;
+    padding-bottom: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -121,7 +122,6 @@ export default {
 .modal-content {
     background-color: rgba(0, 0, 0, 0.1);
     padding: 1rem 1rem;
-    margin-top: 1rem;
     overflow: auto;
     max-height: 100%;
     max-width: 100%;

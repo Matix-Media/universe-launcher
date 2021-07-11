@@ -10,7 +10,8 @@
             <div
                 v-for="(option, i) of options"
                 :key="i"
-                @click="selected = option;open = false;$emit('input', option);"
+                @click="customSelected = option;open = false;$emit('input', option);"
+                :class="{'item-selected': selected == option}"
             >
                 {{ option }}
             </div>
@@ -38,13 +39,25 @@ export default {
   },
   data() {
     return {
-      selected: this.default
-        ? this.default
-        : this.options.length > 0
-        ? this.options[0]
-        : null,
+      customSelected: null,
       open: false,
     };
+  },
+  computed: {
+    selected() {
+      if (this.customSelected)
+        return this.customSelected;
+      if (this.default)
+        return this.default;
+      if (this.options.length > 0)
+        return this.options[0];
+      return null;
+    }
+  },
+  watch: {
+    default: function() {
+      this.$emit("input", this.selected);
+    }
   },
   mounted() {
     this.$emit("input", this.selected);
@@ -85,11 +98,11 @@ export default {
     height: 0;
     border: 5px solid transparent;
     border-color: #fff transparent transparent transparent;
-    transition: transform .2s , margin .2s;
+    transition: transform .1s , margin .1s;
     transition-timing-function: cubic-bezier(0.215, 0.61, 0.353, 1);
 }
 
-.custom-select .selected.open:after {
+.custom-select .selected.open .arrow {
     transform: rotate(-180deg);
     margin-top: -.4em;
 }
@@ -102,18 +115,25 @@ export default {
   background-color: rgb(48, 61, 68);
   top: calc(100% + .2rem);
   left: 0;
-  right: 0;
   z-index: 1;
   line-height: 2em;
   box-shadow: 1px 4px 9px -1px rgba(0,0,0,0.08);
   border-radius: 3px;
+  max-height: 15rem;
+  min-width: 100%;
+  width: max-content;
+  overflow: auto;
 }
 
 .custom-select .items div {
   color: #fff;
-  padding-left: 1em;
+  padding: 0 1em;
   cursor: pointer;
   user-select: none;
+}
+
+.custom-select .items div.item-selected {
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .custom-select .items div:hover {

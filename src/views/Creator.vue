@@ -1,5 +1,5 @@
 <template>
-    <div class="creator" :class="{loaded: isLoaded}">
+    <div class="creator" :class="{loaded: $creator.isLoaded}">
         <div class="creator-loading">
             <div class="box">
                 <div class="logo">
@@ -13,7 +13,7 @@
         </div>
 
         <div class="creator-content">
-            <router-view v-if="isLoaded" />
+            <router-view v-if="$creator.isLoaded" />
         </div>
     </div>
 </template>
@@ -27,10 +27,9 @@ export default {
         }
     },
     mounted() {
-        this.$nextTick(() => {
-            setTimeout(() => {
-                this.isLoaded = true;
-            }, 1000);
+        this.$nextTick(async () => {
+            await this.$creator.load();
+            this.$forceUpdate();
         });
     }
 }
@@ -96,30 +95,4 @@ export default {
     margin-top: -.5rem;
 }
 
-@keyframes breathing {
-    0% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: .8;
-    }
-
-    100% {
-        opacity: 1;
-    }
-}
-
-@keyframes spinning {
-    0% {
-        transform: rotate(0deg);
-    }
-    20% {
-        transform: rotate(360deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
 </style>

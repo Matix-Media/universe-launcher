@@ -15,7 +15,7 @@ const apiUrl = isDevelopment ? "http://localhost:3000" : "https://api.universe.m
 var userData;
 var paths;
 ipcRenderer.send("user_data_path");
-ipcRenderer.on("user_data_path", (event, args) => {
+ipcRenderer.once("user_data_path", (event, args) => {
     userData = args.userData;
     paths = {
         library: path.join(userData, "library.json"),
@@ -378,8 +378,6 @@ export default class API {
                         content.accounts[key] = value;
 
                         await fsp.writeFile(paths.accounts, JSON.stringify(content));
-
-                        console.log("Account is valid");
                     } else {
                         console.error("Could not refresh tokens (Unknown error).");
                         lastThrownError = new Error(
@@ -439,7 +437,7 @@ export default class API {
                         continue;
                     }
                 } else {
-                    console.log("Account validated");
+                    console.log("Account is valid");
                     this.accounts[key] = value;
                 }
             } else {
