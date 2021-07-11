@@ -259,6 +259,33 @@ div.skeleton-loader .sk-bg::after {
     }
 }
 
+@keyframes breathing {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .8;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes spinning {
+    0% {
+        transform: rotate(0deg);
+    }
+    20% {
+        transform: rotate(360deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 h1, h2, h3, h4, h5, h6, a, p {
   margin: 0;
   cursor: default;
