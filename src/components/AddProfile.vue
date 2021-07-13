@@ -381,31 +381,4 @@ a:visited:hover {
     stroke-dashoffset: 48;
     animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
 }
-
-@keyframes fadeIn {
-  0% {opacity:0;}
-  100% {opacity:1;}
-}
-
-@keyframes stroke {
-    100% {
-        stroke-dashoffset: 0;
-    }
-}
-
-@keyframes scale {
-    0%, 100% {
-        transform: none;
-    }
-
-    50% {
-        transform: scale3d(1.1, 1.1, 1);
-    }
-}
-
-@keyframes fill {
-    100% {
-        box-shadow: inset 0px 0px 0px 5px #4bb71b;
-    }
-}
 </style>

@@ -1,51 +1,62 @@
 <template>
-        <div class="modal-mask" :class="{closing: isClosing}" v-on:click.self="close()">
-            <div class="modal-container" :style="{width: width}" :class="{'height-animation': heightAnimation}">
-                <div class="modal-header" v-if="title != '' || $slots.header">
-                    <h3>
-                        {{ title }}
-                    </h3>
-                    <div class="header-buttons">
-                        <slot name="header"></slot>
-                        <i v-if="closeable" @click="close()" class="close-button fas fa-times"></i>
-                    </div>
-                </div>
-                <div class="modal-content" :style="contentStyle">
-                    <slot></slot>
-                </div>
-                <div class="modal-footer" v-if="buttons.length > 0">
-                    <button v-for="button in buttons" :key="button.text" @click="$emit(button.emit)" :class="{primary: button.primary}">{{ button.text }}</button>
+    <div class="modal-mask" :class="{ closing: isClosing }" v-on:click.self="close()">
+        <div
+            class="modal-container"
+            :style="{ width: width }"
+            :class="{ 'height-animation': heightAnimation }"
+        >
+            <div class="modal-header" v-if="title != '' || $slots.header">
+                <h3>
+                    {{ title }}
+                </h3>
+                <div class="header-buttons">
+                    <slot name="header"></slot>
+                    <i v-if="closeable" @click="close()" class="close-button fas fa-times"></i>
                 </div>
             </div>
+            <div class="modal-content" :style="contentStyle">
+                <slot></slot>
+            </div>
+            <div class="modal-footer" v-if="buttons.length > 0">
+                <button
+                    v-for="button in buttons"
+                    :key="button.text"
+                    @click="$emit(button.emit)"
+                    :class="{ primary: button.primary }"
+                >
+                    {{ button.text }}
+                </button>
+            </div>
         </div>
+    </div>
 </template>
 
 <script>
 export default {
     name: "Modal",
     props: {
-        title: {default: ""}, 
-        width: {default: "50%"},
-        heightAnimation: {default: false},
-        buttons: {default: () => []}, 
-        closeable: {default: false},
-        contentStyle: {default: () => {}}
+        title: { default: "" },
+        width: { default: "50%" },
+        heightAnimation: { default: false },
+        buttons: { default: () => [] },
+        closeable: { default: false },
+        contentStyle: { default: () => {} },
     },
     data() {
         return {
-            isClosing: false
-        }
+            isClosing: false,
+        };
     },
     methods: {
         async close() {
             if (this.closeable) {
                 this.isClosing = true;
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise((resolve) => setTimeout(resolve, 100));
                 this.$emit("close");
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>
 
 <style scoped>
@@ -56,29 +67,39 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0, 0.5);
-    transition: opacity .3s ease;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: opacity 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: fadeIn linear .1s;
+    animation: fadeIn linear 0.1s;
 }
 .modal-mask.closing {
-    animation: fadeOut linear .1s;
+    animation: fadeOut linear 0.1s;
     animation-fill-mode: forwards;
 }
 
 @keyframes fadeIn {
-  0% {opacity:0;}
-  100% {opacity:1;}
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 @keyframes fadeOut {
-  0% {opacity:1;}
-  100% {opacity:0;display: none;}
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        display: none;
+        visibility: hidden;
+    }
 }
 
 .modal-container {
-    background-color: rgba(47, 54, 61, 0.50);
+    background-color: rgba(47, 54, 61, 0.5);
     backdrop-filter: blur(15px);
     border-radius: 4px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
@@ -101,10 +122,10 @@ export default {
 }
 
 .modal-header .header-buttons .close-button {
-    font-size: .9rem;
+    font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.2);
     cursor: pointer;
-    transition: color .2s;
+    transition: color 0.2s;
     margin-left: 1rem;
 }
 
@@ -116,8 +137,6 @@ export default {
     display: flex;
     align-items: center;
 }
-
-
 
 .modal-content {
     background-color: rgba(0, 0, 0, 0.1);
@@ -136,16 +155,16 @@ export default {
 .modal-footer button {
     border: none;
     border-radius: 4px;
-    padding: .5rem 2rem;
+    padding: 0.5rem 2rem;
     margin-left: 1rem;
     color: white;
-    background-color: rgba(53, 66, 75, .9);
+    background-color: rgba(53, 66, 75, 0.9);
     cursor: pointer;
-    font-family: 'Roboto';
+    font-family: "Roboto";
     text-transform: uppercase;
-    font-size: .8rem;
+    font-size: 0.8rem;
     font-weight: 300;
-    transition: background-color .2s;
+    transition: background-color 0.2s;
 }
 
 .modal-footer button:hover {
