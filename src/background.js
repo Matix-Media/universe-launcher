@@ -12,6 +12,9 @@ import fetch from "node-fetch";
 //const MSMC = require("msmc");
 import MSMC from "msmc";
 //const MSMC = require("./classes/MSMC/microsoft");
+
+Object.assign(console, log.functions);
+
 MSMC.setFetch(fetch);
 
 const shell = electron.shell;
@@ -86,13 +89,14 @@ async function createWindow(args) {
         e.preventDefault();
         shell.openExternal(url);
     });
-
+    /*
     win.webContents.on("console-message", (e, level, message, line) => {
         line = line.toString();
         while (line.length < 5) line = "0" + line;
         var msg = "(L" + line + ") " + message;
         switch (level) {
             case 0:
+                log.lo;
                 log.verbose(msg);
                 break;
             case 1:
@@ -109,8 +113,8 @@ async function createWindow(args) {
                 break;
         }
     });
+*/
 }
-
 if (app.requestSingleInstanceLock()) {
     app.on("second-instance", (event, commandLine) => {
         console.log("Second instance was started with parameters:", commandLine);
