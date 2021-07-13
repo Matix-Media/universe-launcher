@@ -398,7 +398,6 @@ export default class API {
                                 _msmc: { refresh: value.refreshToken },
                             });
                             ipcRenderer.once("refresh_oauth2_ms_callback", (event, callback) => {
-                                console.log(callback);
                                 let profile = {
                                     type: "Xbox",
                                     id: callback.profile.id,
