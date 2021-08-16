@@ -271,7 +271,6 @@ export default {
                     selectedModloader,
                     this.project.version
                 );
-                console.log(latestModloaderVersion);
                 if (!latestModloaderVersion)
                     this.latestModloaderVersion = this.availableModloaderVersions[0];
                 else this.latestModloaderVersion = latestModloaderVersion.name;
