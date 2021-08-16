@@ -389,7 +389,9 @@ export default class API {
                 value.type.toLowerCase() === "xbox" ||
                 value.type.toLowerCase() === "microsoft"
             ) {
-                var valid = MSMC.Validate({ _msmc: { expires_by: value.expires } });
+                var valid = MSMC.validate({
+                    _msmc: { expires_by: value.expires, mcToken: "filler" },
+                });
                 if (!valid) {
                     console.log("Updating tokens...");
                     try {
@@ -426,6 +428,9 @@ export default class API {
                                     }
                                 }
                             );
+                            ipcRenderer.once("refresh_oauth2_ms_error", (event, err) => {
+                                reject(err);
+                            });
                         });
                         await fsp.writeFile(paths.accounts, JSON.stringify(content));
 

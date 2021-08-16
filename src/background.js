@@ -51,6 +51,7 @@ async function createWindow(args) {
             // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
             nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
             contextIsolation: false,
+            webSecurity: false,
         },
     });
 
@@ -89,6 +90,7 @@ async function createWindow(args) {
         e.preventDefault();
         shell.openExternal(url);
     });
+
     /*
     win.webContents.on("console-message", (e, level, message, line) => {
         line = line.toString();
@@ -247,26 +249,34 @@ ipcMain.on("clear_cache", (event) => {
     });
 });
 
-ipcMain.on("login_oauth2_ms", (event) => {
-    MSMC.getElectron().FastLaunch(
-        (call) => {
-            event.sender.send("login_oauth2_ms_callback", call);
-        },
-        (update) => {
-            event.sender.send("login_oauth2_ms_update", update);
-        },
-        "select_account"
-    );
+ipcMain.on("login_oauth2_ms", async (event) => {
+    try {
+        var res = await MSMC.fastLaunch(
+            "electron",
+            (update) => {
+                event.sender.send("login_oauth2_ms_update", update);
+            },
+            "select_account"
+        );
+        event.sender.send("login_oauth2_ms_callback", {
+            access_token: res.access_token,
+            profile: res.profile,
+        });
+    } catch (err) {
+        event.sender.send("login_oauth2_ms_error", err);
+    }
 });
 
-ipcMain.on("refresh_oauth2_ms", (event, args) => {
-    MSMC.MSRefresh(
-        args,
-        (callback) => {
-            event.sender.send("refresh_oauth2_ms_callback", callback);
-        },
-        (update) => {
+ipcMain.on("refresh_oauth2_ms", async (event, args) => {
+    try {
+        var res = await MSMC.refresh(args, (update) => {
             event.sender.send("refresh_oauth2_ms_update", update);
-        }
-    );
+        });
+        event.sender.send("refresh_oauth2_ms_callback", {
+            access_token: res.access_token,
+            profile: res.profile,
+        });
+    } catch (err) {
+        event.sender.send("refresh_oauth2_ms_error", err);
+    }
 });

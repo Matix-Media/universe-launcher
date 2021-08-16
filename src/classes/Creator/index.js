@@ -1,3 +1,6 @@
+/* global __static */
+"strict mode";
+
 import fs from "fs";
 import { ipcRenderer } from "electron";
 import path from "path";
@@ -5,17 +8,22 @@ import isValid from "is-valid-path";
 import _ from "lodash";
 import sanitize from "sanitize-filename";
 import os from "os";
-import axios from "axios";
+import CurseforgeAPI from "../CurseforgeAPI";
 
 const fsp = fs.promises;
 
+const creator_assets = path.join(__static, "static/creator");
 const prefix = "[CREATOR] ";
 const default_assets = [
-    { id: "icon.png", url: "https://imgur.com/0hNTFdN.png" },
-    { id: "", url: "" },
+    {
+        id: "icon.png",
+        source: path.join(creator_assets, "defaults", "modpack_icon.png"),
+    },
+    {
+        id: "logo.png",
+        source: path.join(creator_assets, "defaults", "modpack_icon.png"),
+    },
 ];
-
-("strict mode");
 
 export default class Creator {
     isLoaded = false;
@@ -50,6 +58,10 @@ export default class Creator {
         return this.#projects.lastUsedRoot ? this.#projects.lastUsedRoot : this.#paths.documents;
     }
 
+    async saveSettings() {
+        await fsp.writeFile(this.#paths.projects, JSON.stringify(this.#projects));
+    }
+
     async checkProjectLocation(location) {
         if (_.isEmpty(location) || !isValid(location) || location.trim() == "") return false;
         if (fs.existsSync(location)) return false;
@@ -63,7 +75,7 @@ export default class Creator {
     }
 
     // eslint-disable-next-line no-unused-vars
-    async createProject(location, name, modpackName, mcVersion) {
+    async createProject(location, name, modpackName, mcVersion, modloader, modloaderVersion) {
         this.#projects.lastUsedRoot = path.dirname(location);
 
         console.log(prefix + 'Creating project "' + name + '"...');
@@ -85,6 +97,25 @@ export default class Creator {
             await fsp.mkdir(path.join(location, path_));
         }
 
+        console.log(prefix + "Copying default assets...");
+
+        for (let asset of default_assets) {
+            let targetLocation = path.join(location, paths.assets, asset.id);
+            await fsp.copyFile(asset.source, targetLocation);
+
+            /*var res = await axios.get(asset.source, { responseType: "arraybuffer" });
+            var f = await fsp.open(targetLocation, "w");
+            await f.write(Buffer.from(res.data, "binary"));
+            await f.close();*/
+        }
+
+        console.log(prefix + "Downloading modloader version information");
+
+        let modloaderInformation = await CurseforgeAPI.instance.getModloaderInformation(
+            modloaderVersion
+        );
+        console.log(modloaderInformation);
+
         let projectMeta = {
             project: {
                 name: name,
@@ -94,6 +125,11 @@ export default class Creator {
                 name: modpackName,
                 minecraft: {
                     version: mcVersion,
+                    versionJson: modloaderInformation.versionJson,
+                },
+                modloader: {
+                    type: modloader,
+                    version: modloaderVersion,
                 },
                 version: "1.0.0",
                 description: "Another UNIVERSE Launcher modpack.",
@@ -107,28 +143,15 @@ export default class Creator {
                 },
             },
         };
+
         await fsp.writeFile(
             path.join(location, sanitize(name) + ".ulmpmeta.json"),
             JSON.stringify(projectMeta)
         );
 
-        console.log(prefix + "Downloading default assets...");
-
-        for (let asset of default_assets) {
-            let file = fs.createWriteStream(path.join(location, paths.assets, asset.id));
-            let response = await axios.get(asset.url, { responseType: "stream" });
-
-            await new Promise((resolve) => {
-                response.data.pipe(file);
-                file.on("error", (err) => {
-                    throw new Error(err);
-                });
-                file.on("close", () => resolve());
-            });
-        }
-
         console.log(prefix + "Project created successfully!");
 
         this.#projects.openedProjects.push({ name: name, location: location });
+        this.saveSettings();
     }
 }

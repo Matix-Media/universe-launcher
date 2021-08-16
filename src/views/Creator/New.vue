@@ -57,8 +57,30 @@
                         :options="availableVersion"
                         :default="latestVersion"
                         v-model="project.version"
+                        @input="changeModloaderVersion()"
                     />
                     <p class="description">The version can <b>NOT</b> be changed later on.</p>
+                </label>
+                <label class="option">
+                    <p class="name">Modloader</p>
+                    <dropdown
+                        :style="{ zIndex: 4 }"
+                        :options="availableModloaders"
+                        default="Forge"
+                        v-model="project.modloader.loader"
+                        @input="changeModloaderVersion()"
+                    />
+                    <p class="description">The modloader can <b>NOT</b> be changed later on.</p>
+                </label>
+                <label class="option">
+                    <p class="name">Modloader version</p>
+                    <dropdown
+                        :style="{ zIndex: 3 }"
+                        :options="availableModloaderVersions"
+                        :default="latestModloaderVersion"
+                        v-model="project.modloader.version"
+                    />
+                    <p class="description">The modloader can <b>NOT</b> be changed later on.</p>
                 </label>
             </full-list>
 
@@ -76,8 +98,16 @@
                 </button>
             </div>
         </div>
-        <modal width="20rem" v-if="creatingProject">
-            <div class="creating-project">
+        <modal
+            width="20rem"
+            v-if="creatingProject"
+            :closeable="creationError"
+            @close="
+                creatingProject = false;
+                checkValidLocation();
+            "
+        >
+            <div class="creating-project" v-if="!creationError">
                 <img
                     src="@/assets/images/branding/icon.svg"
                     class="icon"
@@ -85,6 +115,11 @@
                     alt=""
                 />
                 <p>Your project is beeing created...</p>
+            </div>
+            <div class="creation-error" v-if="creationError">
+                <i class="fas fa-times"></i>
+
+                <p>{{ creationError }}</p>
             </div>
         </modal>
     </div>
@@ -94,6 +129,7 @@
 import Dropdown from "../../components/controls/Dropdown.vue";
 import FullList from "../../components/FullList.vue";
 import MCLauncherAPI from "../../classes/MCLauncherAPI";
+import CurseforgeAPI from "../../classes/CurseforgeAPI";
 import _ from "lodash";
 import path from "path";
 import fs from "fs";
@@ -108,15 +144,23 @@ export default {
             loadingVersion: true,
             availableVersion: ["Loading..."],
             latestVersion: "Loading...",
+            availableModloaders: ["Forge", "Fabric"],
+            availableModloaderVersions: ["Loading..."],
+            latestModloaderVersion: "Loading...",
             isValidLocation: true,
             lastName: "ModpackProject",
             dialogOpen: false,
             creatingProject: false,
+            creationError: null,
             project: {
                 name: "ModpackProject",
                 modpackName: "Modpack",
                 location: null,
                 version: null,
+                modloader: {
+                    loader: null,
+                    version: null,
+                },
             },
         };
     },
@@ -127,7 +171,6 @@ export default {
                 i++;
                 let name = "ModpackProject" + i;
                 this.project.name = name;
-                this.latestVersion = name;
                 this.project.modpackName = "Modpack" + i;
             }
 
@@ -135,6 +178,7 @@ export default {
                 var res = await new MCLauncherAPI().getVersions();
                 this.availableVersion = res.versions;
                 this.latestVersion = res.latest;
+
                 this.loadingVersion = false;
             } catch (err) {
                 console.error("Error getting versions", err);
@@ -145,6 +189,7 @@ export default {
     },
     computed: {
         canCreate() {
+            if (this.loadingVersion) return false;
             if (
                 _.isEmpty(this.project.name) ||
                 !this.isValidLocation ||
@@ -203,6 +248,40 @@ export default {
             });
         },
 
+        async changeModloaderVersion() {
+            try {
+                var curseforgeAPI = CurseforgeAPI.instance;
+                this.loadingVersion = true;
+                this.availableModloaderVersions = ["Loading..."];
+                this.latestModloaderVersion = "Loading...";
+                var modloaders = { Forge: 1, Fabric: 4 };
+                var selectedModloader = modloaders[this.project.modloader.loader];
+                var modloaderVersions = await curseforgeAPI.getSpecificModloaders(
+                    selectedModloader,
+                    [this.project.version],
+                    false
+                );
+                if (!modloaderVersions.length || modloaderVersions.length == 0) {
+                    this.availableModloaderVersions = ["No fitting versions found."];
+                    this.latestModloaderVersion = "No fitting versions found.";
+                    return;
+                }
+                this.availableModloaderVersions = modloaderVersions;
+                var latestModloaderVersion = await curseforgeAPI.getLatestModloaderVersion(
+                    selectedModloader,
+                    this.project.version
+                );
+                console.log(latestModloaderVersion);
+                if (!latestModloaderVersion)
+                    this.latestModloaderVersion = this.availableModloaderVersions[0];
+                else this.latestModloaderVersion = latestModloaderVersion.name;
+
+                this.loadingVersion = false;
+            } catch (err) {
+                //
+            }
+        },
+
         async createProject() {
             if (!this.canCreate) return;
 
@@ -213,11 +292,14 @@ export default {
                     this.getLocation,
                     this.project.name,
                     this.project.modpackName,
-                    this.project.version
+                    this.project.version,
+                    this.project.modloader.loader,
+                    this.project.modloader.version
                 );
                 await new Promise((resolve) => setTimeout(resolve(), 1000));
             } catch (err) {
-                console.error("Error creating modpack:", err);
+                this.creationError = err.message;
+                console.error("Error creating modpack:", err, err.stack);
             }
         },
     },
@@ -230,12 +312,25 @@ div.creator-new {
     justify-content: center;
 }
 
-div.creating-project {
+div.creation-error i {
+    color: rgba(231, 77, 60, 0.6);
+    font-size: 100px;
+    margin-bottom: 1rem;
+}
+
+div.creation-error {
+    animation: fadeIn ease-in-out 0.4s;
+}
+
+div.creating-project,
+div.creation-error {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
 
+div.creating-project {
     animation-name: breathing;
     animation-duration: 2s;
     animation-iteration-count: infinite;
@@ -250,12 +345,15 @@ div.creating-project img {
     animation-iteration-count: infinite;
 }
 
+div.creation-error p,
 div.creating-project p {
     font-size: 1rem;
-    font-weight: 300;
-    color: rgba(255, 255, 255, 0.7);
-    margin-top: 1rem;
+    color: rgba(255, 255, 255, 0.8);
     margin-bottom: 0.5rem;
+}
+
+div.creating-project p {
+    margin-top: 1rem;
 }
 
 div.options {
@@ -389,6 +487,6 @@ label.option.error .text-box:read-only {
 
 .custom-select {
     padding: 0.3rem;
-    z-index: 9999;
+    z-index: 5;
 }
 </style>
