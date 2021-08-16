@@ -51,7 +51,7 @@ async function createWindow(args) {
             // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
             nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
             contextIsolation: false,
-            webSecurity: false,
+            //webSecurity: false,
         },
     });
 
@@ -91,32 +91,13 @@ async function createWindow(args) {
         shell.openExternal(url);
     });
 
-    /*
-    win.webContents.on("console-message", (e, level, message, line) => {
-        line = line.toString();
-        while (line.length < 5) line = "0" + line;
-        var msg = "(L" + line + ") " + message;
-        switch (level) {
-            case 0:
-                log.lo;
-                log.verbose(msg);
-                break;
-            case 1:
-                log.info(msg);
-                break;
-            case 2:
-                log.warn(msg);
-                break;
-            case 3:
-                log.error(msg);
-                break;
-            default:
-                log.info(msg);
-                break;
-        }
+    const cors_filter = { urls: ["*://addons-ecs.forgesvc.net/*"] };
+    win.webContents.session.webRequest.onHeadersReceived(cors_filter, (details, callback) => {
+        details.responseHeaders["Access-Control-Allow-Origin"] = "*";
+        callback({ responseHeaders: details.responseHeaders });
     });
-*/
 }
+
 if (app.requestSingleInstanceLock()) {
     app.on("second-instance", (event, commandLine) => {
         console.log("Second instance was started with parameters:", commandLine);
