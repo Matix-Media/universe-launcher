@@ -24,12 +24,16 @@ module.exports = {
                     output: "build",
                 },
                 mac: {
+                    target: ["dmg", "zip"],
                     icon: "./src/assets/images/branding/icon.icns",
                 },
                 win: {
+                    target: ["nsis", "zip"],
                     icon: "./src/assets/images/branding/app_icon.ico",
+                    publisherName: "Matix Media",
                 },
                 linux: {
+                    target: ["AppImage", "zip"],
                     icon: "./src/assets/images/branding/app_icon.png",
                 },
             },
