@@ -91,7 +91,13 @@ async function createWindow(args) {
         shell.openExternal(url);
     });
 
-    const cors_filter = { urls: ["*://addons-ecs.forgesvc.net/*"] };
+    const cors_filter = {
+        urls: ["*://addons-ecs.forgesvc.net/*"],
+    };
+    win.webContents.session.webRequest.onBeforeSendHeaders(cors_filter, (details, callback) => {
+        details.requestHeaders["Origin"] = null;
+        callback({ requestHeaders: details.requestHeaders });
+    });
     win.webContents.session.webRequest.onHeadersReceived(cors_filter, (details, callback) => {
         details.responseHeaders["Access-Control-Allow-Origin"] = "*";
         callback({ responseHeaders: details.responseHeaders });
@@ -261,3 +267,12 @@ ipcMain.on("refresh_oauth2_ms", async (event, args) => {
         event.sender.send("refresh_oauth2_ms_error", err);
     }
 });
+
+/*ipcMain.handle("refresh_mojang", async (event, value) => {
+    let response = await MSMC.getMCLC().refresh({
+        access_token: value.accessToken,
+        client_token: value.clientToken,
+    });
+    return response;
+});
+*/
