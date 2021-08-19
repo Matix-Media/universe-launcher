@@ -358,6 +358,14 @@ export default class API {
                 } catch (err) {
                     console.log("Updating tokens...");
                     try {
+                        /*ipcRenderer.invoke("refresh_mojang")
+
+                        MSMC.setFetch(require("node-fetch"));
+                        response = await MSMC.getMCLC().refresh({
+                            access_token: value.accessToken,
+                            client_token: value.clientToken,
+                        });
+                        console.log(response);*/
                         response = await Authenticator.refreshAuth(
                             value.accessToken,
                             value.clientToken
