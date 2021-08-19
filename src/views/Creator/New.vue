@@ -287,7 +287,7 @@ export default {
             this.creatingProject = true;
 
             try {
-                await this.$creator.createProject(
+                var location = await this.$creator.createProject(
                     this.getLocation,
                     this.project.name,
                     this.project.modpackName,
@@ -295,7 +295,12 @@ export default {
                     this.project.modloader.loader,
                     this.project.modloader.version
                 );
-                await new Promise((resolve) => setTimeout(resolve(), 1000));
+                await new Promise((resolve) => setTimeout(() => resolve(), 1000));
+                console.log("Successfully created project.");
+                this.$router.push({
+                    name: "creator-editor",
+                    params: { projectLocation: location },
+                });
             } catch (err) {
                 this.creationError = err.message;
                 console.error("Error creating modpack:", err, err.stack);
