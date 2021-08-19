@@ -128,8 +128,8 @@
 <script>
 import Dropdown from "../../components/controls/Dropdown.vue";
 import FullList from "../../components/FullList.vue";
-import MCLauncherAPI from "../../classes/MCLauncherAPI";
-import CurseforgeAPI from "../../classes/CurseforgeAPI";
+import MCLauncherAPI from "../../classes/mc-launcher-api";
+import CurseforgeAPI from "../../classes/curseforge-api";
 import _ from "lodash";
 import path from "path";
 import fs from "fs";

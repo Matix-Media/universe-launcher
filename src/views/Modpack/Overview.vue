@@ -7,7 +7,7 @@
 <script>
 import FullList from "../../components/FullList.vue";
 import MarkdownItVue from "markdown-it-vue"
-import MarkdownOptions from "../../classes/markdownOptions"
+import MarkdownOptions from "../../classes/markdown-options"
 
 export default {
     name: "Overview",

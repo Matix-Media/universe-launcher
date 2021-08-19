@@ -97,7 +97,7 @@ import Sidebar from "./components/Sidebar.vue";
 import Splash from "./views/Splash.vue";
 import Modal from "./components/Modal.vue";
 import MarkdownItVue from "markdown-it-vue";
-import MarkdownOptions from "./classes/markdownOptions";
+import MarkdownOptions from "./classes/markdown-options";
 
 export default {
     name: "App",
