@@ -22,7 +22,7 @@
 <script>
 import Modal from "../components/Modal.vue";
 import { ipcRenderer } from "electron";
-import ReactiveVar from "../classes/ReactiveVar";
+import ReactiveVar from "../classes/Helpers/ReactiveVar";
 
 export default {
     name: "Splash",
