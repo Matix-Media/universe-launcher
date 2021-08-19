@@ -36,7 +36,6 @@
         "minecraft-launcher-core": "^3.16.2",
         "msmc": "^2.1.0",
         "node-fetch": "^2.6.1",
-        "node-nbt": "^1.0.0",
         "sanitize-filename": "^1.6.3",
         "toml": "^3.0.0",
         "uuid": "^8.3.2",
