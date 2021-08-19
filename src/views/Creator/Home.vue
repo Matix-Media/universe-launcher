@@ -1,14 +1,40 @@
 <template>
     <div class="creator-home">
         <div class="projects-manager">
-            <full-list title="Recent projects" class="recent-projects">
-                <p class="no-projects">
-                    You haven't opened any projects.<br> 
+            <full-list title="Recent projects" class="recent-projects" :padding="0">
+                <p
+                    class="no-projects"
+                    v-if="recentProjects.projects.length == 0 && recentProjects.loading == false"
+                >
+                    You haven't opened any projects.<br />
                     Click on one of the buttons on the right to get started.
                 </p>
+                <div
+                    class="project"
+                    v-for="(project, i) in recentProjects.projects"
+                    :key="i"
+                    @click="
+                        $creator.setLastUsedProject(project.location);
+                        $router.push({
+                            name: 'creator-editor',
+                            params: { projectLocation: project.location },
+                        });
+                    "
+                >
+                    <div class="info">
+                        <div class="first-line">
+                            <p class="name">{{ project.name }}</p>
+                            <span class="error" v-if="!project.available">not found</span>
+                        </div>
+                        <p class="location">{{ project.root }}</p>
+                    </div>
+                    <div class="right">
+                        {{ project.lastOpened | luxon("med") }}
+                    </div>
+                </div>
             </full-list>
             <div class="controls">
-                <router-link :to="{name: 'creator-new'}">
+                <router-link :to="{ name: 'creator-new' }">
                     <i class="fas fa-file-medical"></i>
                     <div>
                         <p class="name">New Modpack</p>
@@ -17,7 +43,7 @@
                         </p>
                     </div>
                 </router-link>
-                <router-link :to="{name: 'creator-import'}">
+                <router-link :to="{ name: 'creator-import' }">
                     <i class="fas fa-file-download"></i>
                     <div>
                         <p class="name">Import</p>
@@ -26,7 +52,7 @@
                         </p>
                     </div>
                 </router-link>
-                <router-link :to="{name: 'creator-clone'}">
+                <router-link :to="{ name: 'creator-clone' }">
                     <i class="fab fa-git-alt"></i>
                     <div>
                         <p class="name">Clone with git</p>
@@ -36,17 +62,31 @@
                     </div>
                 </router-link>
             </div>
-        </div> 
+        </div>
     </div>
 </template>
 <script>
-import FullList from '../../components/FullList.vue'
+import FullList from "../../components/FullList.vue";
 export default {
     components: { FullList },
-    name: "Creator-Home"
-}
+    name: "Creator-Home",
+    data() {
+        return {
+            recentProjects: {
+                loading: true,
+                projects: [],
+            },
+        };
+    },
+    mounted() {
+        this.$nextTick(async () => {
+            this.recentProjects.projects = await this.$creator.getRecentProjects();
+            this.recentProjects.loading = false;
+        });
+    },
+};
 </script>
-<style scoped>
+<style scoped lang="scss">
 div.creator-home {
     display: flex;
     justify-content: center;
@@ -61,11 +101,63 @@ div.projects-manager {
 
 .recent-projects {
     flex: 1;
+    .project {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        padding-left: 0.7rem;
+        transition: background 0.2s;
+        box-sizing: border-box;
+        justify-content: space-between;
+        cursor: pointer;
+        * {
+            cursor: pointer;
+        }
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .info {
+            display: flex;
+            flex-direction: column;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.75);
+            .first-line {
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                .name {
+                    font-size: 15px;
+                }
+                .error {
+                    display: block;
+                    background-color: rgb(192, 57, 43);
+                    margin-left: 0.7rem;
+                    border-radius: 4px;
+                    text-transform: uppercase;
+                    font-size: 9px;
+                    padding: 0.05rem 0.2rem;
+                }
+            }
+            .location {
+                color: rgba(255, 255, 255, 0.25);
+            }
+        }
+        .right {
+            cursor: pointer;
+            height: 3.5rem;
+            padding-right: 0.7rem;
+            justify-self: flex-end;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.15);
+        }
+    }
 }
 
 .recent-projects .no-projects {
     color: rgba(255, 255, 255, 0.5);
-    font-size: .9rem;
+    font-size: 0.9rem;
     margin: 1rem;
     text-align: center;
 }
@@ -82,15 +174,15 @@ div.projects-manager {
     border-radius: 4px;
     padding: 1rem 1rem;
     color: white;
-    background-color: rgba(53, 66, 75, .9);
+    background-color: rgba(53, 66, 75, 0.9);
     backdrop-filter: blur(15px);
     cursor: pointer;
-    font-family: 'Roboto';
+    font-family: "Roboto";
     text-transform: uppercase;
-    font-size: .9rem;
+    font-size: 0.9rem;
     font-weight: 300;
-    transition: background-color .2s;
-    margin-bottom: .5rem;
+    transition: background-color 0.2s;
+    margin-bottom: 0.5rem;
     text-align: start;
     display: flex;
     text-decoration: none;
