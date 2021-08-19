@@ -13,6 +13,7 @@ import CurseforgeAPI from "../CurseforgeAPI";
 const fsp = fs.promises;
 
 const creator_assets = path.join(__static, "static/creator");
+const metaFileExtensions = [".unvmeta", ".ulmpmeta.json"];
 const prefix = "[CREATOR] ";
 const default_assets = [
     {
@@ -47,6 +48,7 @@ export default class Creator {
 
         try {
             await fsp.access(this.#paths.projects, fs.constants.F_OK);
+            this.#projects = JSON.parse(await fsp.readFile(this.#paths.projects));
         } catch (err) {
             await fsp.writeFile(this.#paths.projects, JSON.stringify(this.#projects));
             return;
@@ -56,6 +58,52 @@ export default class Creator {
 
     getProjectsRoot() {
         return this.#projects.lastUsedRoot ? this.#projects.lastUsedRoot : this.#paths.documents;
+    }
+
+    async getRecentProjects() {
+        let result = [];
+        for (let _project of this.#projects.openedProjects) {
+            let project = {};
+            Object.assign(project, _project);
+
+            project.available = false;
+            project.root = path.dirname(project.location);
+            try {
+                let content = JSON.parse(await fsp.readFile(project.location));
+                if (content.project.name) {
+                    project.name = content.project.name;
+                    project.available = true;
+                }
+
+                console.log(project.lastOpened);
+                if (!project.lastOpened) {
+                    project.lastOpened = new Date().toISOString();
+                }
+            } catch (_) {
+                project.lastOpened = new Date().toISOString();
+            }
+            result.push(project);
+        }
+        return result;
+    }
+
+    async setLastUsedProject(location) {
+        var project = null;
+        var projectFound = false;
+        for (project of this.#projects.openedProjects) {
+            if (project.location != location) continue;
+            projectFound = true;
+
+            project.lastOpened = new Date().toISOString();
+            break;
+        }
+
+        if (projectFound && this.#projects.openedProjects.indexOf(project) > 0) {
+            this.#projects.openedProjects.splice(this.#projects.openedProjects.indexOf(project), 1);
+            this.#projects.openedProjects.unshift(project);
+        }
+
+        await this.saveSettings();
     }
 
     async saveSettings() {
@@ -74,7 +122,6 @@ export default class Creator {
         return true;
     }
 
-    // eslint-disable-next-line no-unused-vars
     async createProject(location, name, modpackName, mcVersion, modloader, modloaderVersion) {
         this.#projects.lastUsedRoot = path.dirname(location);
 
@@ -84,6 +131,7 @@ export default class Creator {
 
         console.log(prefix + "Creating project meta file...");
 
+        let metaFile = path.join(location, sanitize(name) + metaFileExtensions[0]);
         let paths = {
             debug: "debug",
             build: "build",
@@ -109,12 +157,11 @@ export default class Creator {
             await f.close();*/
         }
 
-        console.log(prefix + "Downloading modloader version information");
+        console.log(prefix + "Downloading modloader version information...");
 
         let modloaderInformation = await CurseforgeAPI.instance.getModloaderInformation(
             modloaderVersion
         );
-        console.log(modloaderInformation);
 
         let projectMeta = {
             project: {
@@ -144,14 +191,17 @@ export default class Creator {
             },
         };
 
-        await fsp.writeFile(
-            path.join(location, sanitize(name) + ".ulmpmeta.json"),
-            JSON.stringify(projectMeta)
-        );
+        await fsp.writeFile(metaFile, JSON.stringify(projectMeta));
 
         console.log(prefix + "Project created successfully!");
 
-        this.#projects.openedProjects.push({ name: name, location: location });
+        this.#projects.openedProjects.unshift({
+            name: name,
+            location: metaFile,
+            lastOpened: new Date().toISOString(),
+        });
         this.saveSettings();
+
+        return metaFile;
     }
 }
