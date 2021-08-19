@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import AdmZip from "adm-zip";
+import zlip from "zlib";
 
 export default {
     /**
@@ -23,5 +24,27 @@ export default {
                 encoding
             );
         });
+    },
+
+    /**
+     * Helpers for the zlib library
+     */
+    zlib: {
+        /**
+         * Asynchronously gunzip buffer
+         * @param {zlib.InputType} buffer The zipped buffer
+         * @returns {Promise<Buffer>}
+         */
+        gunzip(buffer) {
+            return new Promise((resolve, reject) => {
+                zlip.gunzip(buffer, (err, result) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                    }
+                });
+            });
+        },
     },
 };
