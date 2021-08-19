@@ -69,20 +69,22 @@ export default {
 
             this.project.location = this.$route.params.projectLocation;
             let projectExists = await fsb.isFile(this.project.location);
-            console.log("Project file found:", projectExists);
             if (!projectExists) {
                 console.error("The project was not found.");
                 this.errors.popup = {
                     error: new Error("The project was not found."),
                     show: true,
                 };
-                this.loadingProject.loading = true;
+                this.loadingProject.loading = false;
                 return;
             }
 
             try {
                 this.project.editor = new Editor(this.project.location);
-                this.project.editor.load((status) => (this.loadingProject.status = status));
+                await this.project.editor.load((status) => (this.loadingProject.status = status));
+                this.loadingProject.status = "Preparing workspace...";
+                await new Promise((resolve) => setTimeout(() => resolve(), 1000));
+                this.loadingProject.loading = false;
             } catch (err) {
                 console.error("Error loading project.", err);
                 this.errors.popup.error = err;

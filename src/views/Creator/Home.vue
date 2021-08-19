@@ -43,12 +43,21 @@
                         </p>
                     </div>
                 </router-link>
+                <a>
+                    <i class="fas fa-file-upload"></i>
+                    <div>
+                        <p class="name">Open</p>
+                        <p class="description">
+                            Open a local modpack project directory
+                        </p>
+                    </div>
+                </a>
                 <router-link :to="{ name: 'creator-import' }">
                     <i class="fas fa-file-download"></i>
                     <div>
                         <p class="name">Import</p>
                         <p class="description">
-                            Import a project using a .ulmp file
+                            Import a project using a .unv file
                         </p>
                     </div>
                 </router-link>

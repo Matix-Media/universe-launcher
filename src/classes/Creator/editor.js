@@ -4,14 +4,14 @@ import fsb from "../Helpers/fsb";
 import AdmZip from "adm-zip";
 import zipHelper from "../Helpers/zip-helper";
 import toml from "toml";
-import { NbtReader } from "node-nbt";
-import zlib from "zlib";
 
 export default class Editor {
     root = null;
     location = null;
     meta = null;
     mods = [];
+    worlds = [];
+    resourcepacks = [];
 
     constructor(location) {
         this.location = location;
@@ -37,19 +37,55 @@ export default class Editor {
 
         try {
             let modsDir = path.join(this.getPath("instance"), "mods");
-            if (await fsb.exists(modsDir)) {
+            if (await fsb.isDirectory(modsDir)) {
                 let i = 0;
                 for (let file of await fsp.readdir(modsDir)) {
                     if (await this.loadMod(path.join("mods", file))) {
                         i++;
+                        console.log("Loaded mod:", file);
                         callback("Loading mods (" + i + ")...");
                     }
                 }
             }
         } catch (err) {
-            console.warn("Could not load mods: ", err);
+            console.warn("Could not load mods:", err);
         }
-        console.log(this.mods);
+
+        callback("Loading resource packs...");
+
+        try {
+            let packsDir = path.join(this.getPath("instance"), "resourcepacks");
+            if (await fsb.isDirectory(packsDir)) {
+                let i = 0;
+                for (let pack of await fsp.readdir(packsDir)) {
+                    if (await this.loadResourcepack(path.join("resourcepacks", pack))) {
+                        i++;
+                        console.log("Loaded resource pack:", pack);
+                        callback("Loading resource packs (" + i + ")...");
+                    }
+                }
+            }
+        } catch (err) {
+            console.warn("Could not load resourcepacks:", err);
+        }
+
+        callback("Loading worlds...");
+
+        try {
+            let worldsDir = path.join(this.getPath("instance"), "saves");
+            if (await fsb.isDirectory(worldsDir)) {
+                let i = 0;
+                for (let world of await fsp.readdir(worldsDir)) {
+                    if (await this.loadWorld(path.join("saves", world))) {
+                        i++;
+                        console.log("Loaded world:", world);
+                        callback("Loading worlds (" + i + ")...");
+                    }
+                }
+            }
+        } catch (err) {
+            console.warn("Could not load worlds:", err);
+        }
     }
 
     /**
@@ -107,6 +143,41 @@ export default class Editor {
         }
     }
 
+    async loadResourcepack(relPath) {
+        let packPath = path.join(this.getPath("instance"), relPath);
+        if (!(await fsb.exists(packPath))) return null;
+
+        let metaContent = null;
+        if (await fsb.isDirectory(packPath)) {
+            try {
+                metaContent = await fsp.readFile(path.join(packPath, "pack.mcmeta"));
+            } catch (_) {
+                return null;
+            }
+        } else if (path.extname(packPath).toLowerCase() == ".zip") {
+            try {
+                let zip = new AdmZip(packPath);
+                let entry = zip.getEntry("pack.mcmeta");
+                metaContent = await zipHelper.readAsText(zip, entry);
+            } catch (_) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+        metaContent = JSON.parse(metaContent);
+
+        let resourcepack = {
+            name: path.parse(relPath).name,
+            description: metaContent.pack.description,
+            format: metaContent.pack.pack_format,
+            file: relPath,
+        };
+
+        if (!this.resourcepacks.includes(resourcepack)) this.resourcepacks.push(resourcepack);
+        return resourcepack;
+    }
+
     /**
      * Load a world into the editor (The world must be saved in the project instance)
      * @param {string} relPath Relative path starting from the instance directory to the world folder
@@ -116,8 +187,6 @@ export default class Editor {
         let levelDatFile = path.join(this.getPath("instance"), relPath, "level.dat");
         if (!(await fsb.isFile(levelDatFile))) return null;
 
-        let nbtBuffer = await fsp.readFile(levelDatFile);
-        zlib.gunzip()
-        NbtReader.printAscii(nbtBuffer);
+        //return true;
     }
 }

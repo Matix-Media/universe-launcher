@@ -8,7 +8,7 @@ import isValid from "is-valid-path";
 import _ from "lodash";
 import sanitize from "sanitize-filename";
 import os from "os";
-import CurseforgeAPI from "../CurseforgeAPI";
+import CurseforgeAPI from "../curseforge-api";
 
 const fsp = fs.promises;
 
@@ -75,7 +75,6 @@ export default class Creator {
                     project.available = true;
                 }
 
-                console.log(project.lastOpened);
                 if (!project.lastOpened) {
                     project.lastOpened = new Date().toISOString();
                 }
