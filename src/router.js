@@ -89,6 +89,11 @@ export default new Router({
                     name: "creator-clone",
                     component: () => import("./views/Creator/Clone.vue"),
                 },
+                {
+                    path: "editor",
+                    name: "creator-editor",
+                    component: () => import("./views/Creator/Editor.vue")
+                }
             ],
         },
     ],
