@@ -74,12 +74,8 @@ export default class Creator {
                     project.name = content.project.name;
                     project.available = true;
                 }
-
-                if (!project.lastOpened) {
-                    project.lastOpened = new Date().toISOString();
-                }
             } catch (_) {
-                project.lastOpened = new Date().toISOString();
+                //
             }
             result.push(project);
         }
