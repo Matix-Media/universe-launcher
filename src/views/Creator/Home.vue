@@ -9,27 +9,31 @@
                     You haven't opened any projects.<br />
                     Click on one of the buttons on the right to get started.
                 </p>
-                <div
-                    class="project"
-                    v-for="(project, i) in recentProjects.projects"
-                    :key="i"
-                    @click="
-                        $creator.setLastUsedProject(project.location);
-                        $router.push({
-                            name: 'creator-editor',
-                            params: { projectLocation: project.location },
-                        });
-                    "
-                >
-                    <div class="info">
-                        <div class="first-line">
-                            <p class="name">{{ project.name }}</p>
-                            <span class="error" v-if="!project.available">not found</span>
+                <div class="recent-projects-wrapper">
+                    <div
+                        class="project"
+                        v-for="(project, i) in recentProjects.projects"
+                        :key="i"
+                        @click="
+                            $creator.setLastUsedProject(project.location);
+                            $router.push({
+                                name: 'creator-editor',
+                                params: { projectLocation: project.location },
+                            });
+                        "
+                    >
+                        <div class="info">
+                            <div class="first-line">
+                                <p class="name">{{ project.name }}</p>
+                                <span class="error" v-if="!project.available">not found</span>
+                            </div>
+                            <p class="location">{{ project.root }}</p>
                         </div>
-                        <p class="location">{{ project.root }}</p>
-                    </div>
-                    <div class="right">
-                        {{ project.lastOpened | luxon("med") }}
+                        <div class="right">
+                            <span v-if="project.lastOpened">
+                                {{ project.lastOpened | luxon("med") }}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </full-list>
@@ -110,6 +114,12 @@ div.projects-manager {
 
 .recent-projects {
     flex: 1;
+
+    .recent-projects-wrapper {
+        max-height: calc(100vh - 15rem);
+        overflow-y: auto;
+    }
+
     .project {
         display: flex;
         width: 100%;
