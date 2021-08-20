@@ -30,6 +30,7 @@
         "core-js": "^3.11.1",
         "electron-log": "^4.3.5",
         "electron-updater": "^4.3.8",
+        "file-icons-js": "websemantics/file-icons-js",
         "is-valid-path": "^0.1.1",
         "lodash": "^4.17.21",
         "markdown-it-vue": "^1.1.6",

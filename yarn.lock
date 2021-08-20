@@ -5091,6 +5091,10 @@ file-entry-cache@^6.0.1:
   dependencies:
     flat-cache "^3.0.4"
 
+file-icons-js@websemantics/file-icons-js:
+  version "1.1.0"
+  resolved "https://codeload.github.com/websemantics/file-icons-js/tar.gz/e1b283624fc9d1c3876dc2b1e9e8de9db1518953"
+
 file-loader@^4.2.0:
   version "4.3.0"
   resolved "https://registry.npm.taobao.org/file-loader/download/file-loader-4.3.0.tgz?cache=0&sync_timestamp=1603816841545&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Ffile-loader%2Fdownload%2Ffile-loader-4.3.0.tgz"
