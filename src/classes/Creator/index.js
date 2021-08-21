@@ -101,6 +101,21 @@ export default class Creator {
         await this.saveSettings();
     }
 
+    async removeUsedProject(location) {
+        let project;
+        let projectFound = false;
+        for (project of this.#projects.openedProjects) {
+            if (project.location != location) continue;
+            projectFound = true;
+            break;
+        }
+        if (!projectFound) return;
+
+        this.#projects.openedProjects.splice(this.#projects.openedProjects.indexOf(project), 1);
+
+        await this.saveSettings();
+    }
+
     async saveSettings() {
         await fsp.writeFile(this.#paths.projects, JSON.stringify(this.#projects));
     }
