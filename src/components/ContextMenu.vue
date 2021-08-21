@@ -104,7 +104,6 @@ export default {
     position: fixed;
     z-index: 999;
     color: #fff;
-    backdrop-filter: blur(15px);
     background-color: rgb(48, 61, 68);
     line-height: 2em;
     box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px,
