@@ -1,5 +1,26 @@
 <template>
     <div class="creator-home">
+        <context-menu ref="menu">
+            <template slot-scope="{ contextData }">
+                <li
+                    @click="
+                        $refs.menu.close();
+                        removeProjectFromList(contextData);
+                    "
+                >
+                    Remove from list
+                </li>
+                <li
+                    @click="
+                        $refs.menu.close();
+                        openProjectInExplorer(contextData);
+                    "
+                >
+                    Open in file explorer...
+                </li>
+            </template>
+        </context-menu>
+
         <div class="projects-manager">
             <full-list title="Recent projects" class="recent-projects" :padding="0">
                 <p
@@ -14,13 +35,8 @@
                         class="project"
                         v-for="(project, i) in recentProjects.projects"
                         :key="i"
-                        @click="
-                            $creator.setLastUsedProject(project.location);
-                            $router.push({
-                                name: 'creator-editor',
-                                params: { projectLocation: project.location },
-                            });
-                        "
+                        @click="openProject(project)"
+                        @contextmenu.prevent="$refs.menu.open($event, project)"
                     >
                         <div class="info">
                             <div class="first-line">
@@ -78,10 +94,14 @@
         </div>
     </div>
 </template>
+
 <script>
 import FullList from "../../components/FullList.vue";
+import ContextMenu from "../../components/ContextMenu.vue";
+import { shell } from "electron";
+
 export default {
-    components: { FullList },
+    components: { FullList, ContextMenu },
     name: "Creator-Home",
     data() {
         return {
@@ -97,8 +117,27 @@ export default {
             this.recentProjects.loading = false;
         });
     },
+    methods: {
+        openProject(project) {
+            this.$creator.setLastUsedProject(project.location);
+            this.$router.push({
+                name: "creator-editor",
+                params: { projectLocation: project.location },
+            });
+        },
+        async removeProjectFromList(project) {
+            await this.$creator.removeUsedProject(project.location);
+            this.recentProjects.projects = await this.$creator.getRecentProjects();
+        },
+        openProjectInExplorer(project) {
+            this.$nextTick(() => {
+                shell.showItemInFolder(project.root);
+            });
+        },
+    },
 };
 </script>
+
 <style scoped lang="scss">
 div.creator-home {
     display: flex;
