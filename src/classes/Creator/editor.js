@@ -4,6 +4,7 @@ import fsb from "../Helpers/fsb";
 import AdmZip from "adm-zip";
 import zipHelper from "../Helpers/zip-helper";
 import toml from "toml";
+import chokidar from "chokidar";
 
 export default class Editor {
     root = null;
@@ -12,6 +13,9 @@ export default class Editor {
     mods = [];
     worlds = [];
     resourcepacks = [];
+    #events = {
+        fileUpdates: [],
+    };
 
     constructor(location) {
         this.location = location;
@@ -27,6 +31,16 @@ export default class Editor {
         return path.join(this.root, this.meta.project.paths[targetPath]);
     }
 
+    /**
+     * This callback reports the status of the loading process
+     * @callback loadingStatusCallback
+     * @param {string} statusMessage
+     */
+
+    /**
+     * Load the project into the editor
+     * @param {loadingStatusCallback} callback Reports the loading status
+     */
     async load(callback = () => {}) {
         callback("Loading files...");
 
@@ -86,12 +100,18 @@ export default class Editor {
         } catch (err) {
             console.warn("Could not load worlds:", err);
         }
-    }
 
+        callback("Scanning files...");
+
+        // eslint-disable-next-line no-unused-vars
+        chokidar.watch(this.getPath("instance")).on("all", (event, path) => {
+            //console.log(event, path);
+        });
+    }
     /**
      * Load a mod into the editor (The mod must be saved in the project instance)
      * @param {string} relPath Relative path starting from the instance directory to the mod
-     * @return {Promise<object> | Promise<null>} The mod object or null if unable to be loaded
+     * @return {Promise<Object> | Promise<null>} The mod object or null if unable to be loaded
      */
     async loadMod(relPath) {
         if (path.extname(relPath) != ".jar") return null;
@@ -143,6 +163,11 @@ export default class Editor {
         }
     }
 
+    /**
+     * Load a resource pack into the editor (The resource pack must be saved in the project instance)
+     * @param {string} relPath Relative path starting from the instance directory to the resource pack
+     * @returns {Promise<object> | Promise<null>}
+     */
     async loadResourcepack(relPath) {
         let packPath = path.join(this.getPath("instance"), relPath);
         if (!(await fsb.exists(packPath))) return null;
@@ -188,5 +213,13 @@ export default class Editor {
         if (!(await fsb.isFile(levelDatFile))) return null;
 
         //return true;
+    }
+
+    on(event, callback) {
+        if (this.#events[event]) {
+            this.#events[event].push(callback);
+        } else {
+            throw new Error("Unknown event name.");
+        }
     }
 }
