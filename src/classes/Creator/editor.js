@@ -42,6 +42,8 @@ export default class Editor {
      * @param {loadingStatusCallback} callback Reports the loading status
      */
     async load(callback = () => {}) {
+        console.log('Loading "' + path.basename(this.location) + '"');
+
         callback("Loading files...");
 
         let content = JSON.parse(await fsp.readFile(this.location));
