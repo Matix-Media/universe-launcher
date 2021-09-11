@@ -9,9 +9,8 @@ import fs from "fs";
 import electron from "electron";
 import log from "electron-log";
 import fetch from "node-fetch";
-//const MSMC = require("msmc");
 import MSMC from "msmc";
-//const MSMC = require("./classes/MSMC/microsoft");
+import windowStateKeeper from "electron-window-state";
 
 Object.assign(console, log.functions);
 
@@ -29,21 +28,18 @@ protocol.registerSchemesAsPrivileged([
 
 var win;
 
-async function createWindow(args) {
-    var bounds;
-    if (args && args.bounds) {
-        bounds = args.bounds;
-    } else {
-        bounds = {
-            width: 1420,
-            height: 820,
-            x: 20,
-            y: 20,
-        };
-    }
+async function createWindow() {
+    let winState = windowStateKeeper({
+        defaultWidth: 1420,
+        defaultHeight: 820,
+    });
+
     // Create the browser window.
     win = new BrowserWindow({
-        ...bounds,
+        x: winState.x,
+        y: winState.y,
+        width: winState.width,
+        height: winState.height,
         minWidth: 1040,
         title: "UNIVERSE Launcher",
         webPreferences: {
@@ -54,6 +50,8 @@ async function createWindow(args) {
             //webSecurity: false,
         },
     });
+
+    winState.manage(win);
 
     win.setBackgroundColor("#263238");
     win.setMenuBarVisibility(false);
