@@ -134,11 +134,6 @@ app.on("activate", () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", async () => {
-    var data;
-    try {
-        data = JSON.parse(await fsp.readFile(initPath, "utf8"));
-        // eslint-disable-next-line no-empty
-    } catch (e) {}
     if (isDevelopment && !process.env.IS_TEST) {
         // Install Vue Devtools
         try {
@@ -147,7 +142,7 @@ app.on("ready", async () => {
             console.error("Vue Devtools failed to install:", e.toString());
         }
     }
-    createWindow(data);
+    createWindow();
 });
 
 // Exit cleanly on request from parent process in development mode.
