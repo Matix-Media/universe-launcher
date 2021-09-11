@@ -130,9 +130,9 @@ export default {
             this.recentProjects.projects = await this.$creator.getRecentProjects();
         },
         openProjectInExplorer(project) {
-            this.$nextTick(() => {
+            setTimeout(() => {
                 shell.showItemInFolder(project.root);
-            });
+            }, 100);
         },
     },
 };
