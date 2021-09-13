@@ -92,8 +92,8 @@ export default new Router({
                 {
                     path: "editor",
                     name: "creator-editor",
-                    component: () => import("./views/Creator/Editor.vue")
-                }
+                    component: () => import("./views/Creator/Editor.vue"),
+                },
             ],
         },
     ],
