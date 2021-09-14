@@ -48,8 +48,8 @@
         "vue-click-outside": "^1.1.0",
         "vue-luxon": "^0.10.0",
         "vue-meta": "^2.4.0",
+        "vue-monaco": "^1.2.2",
         "vue-router": "^3.5.1",
-        "vue2-ace-editor": "^0.0.15",
         "vuedraggable": "^2.24.3"
     },
     "devDependencies": {
