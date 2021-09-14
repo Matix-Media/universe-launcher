@@ -1,57 +1,99 @@
 <template>
     <div class="settings" v-if="isLoaded">
         <full-list title="Appearance">
-            <checkbox label="Minimize to system tray after starting the game" v-model="settings.appearance.minimizeOnMcStartup" v-on:input="saveSettings()" />
-            <checkbox label="Close UNIVERSE Launcher when exiting Minecraft" v-model="settings.appearance.closeOnMcExit" v-on:input="saveSettings()" />
+            <checkbox
+                label="Minimize to system tray after starting the game"
+                v-model="settings.appearance.minimizeOnMcStartup"
+                v-on:input="saveSettings()"
+            />
+            <checkbox
+                label="Close UNIVERSE Launcher when exiting Minecraft"
+                v-model="settings.appearance.closeOnMcExit"
+                v-on:input="saveSettings()"
+            />
         </full-list>
         <full-list title="Network">
-            <checkbox label="Throttle Downloads" v-model="settings.connectivity.throttleDownloads.enabled" v-on:input="saveSettings()" />
+            <checkbox
+                label="Throttle Downloads"
+                v-model="settings.connectivity.throttleDownloads.enabled"
+                v-on:input="saveSettings()"
+            />
             <div class="sub-settings" v-if="settings.connectivity.throttleDownloads.enabled">
-                <input class="text-box" type="number" min="0" v-model="settings.connectivity.throttleDownloads.throttle"> 
+                <input
+                    class="text-box"
+                    type="number"
+                    min="0"
+                    v-model="settings.connectivity.throttleDownloads.throttle"
+                />
                 <p class="text right">KB/s</p>
             </div>
-            <checkbox label="Use proxy" v-model="settings.connectivity.proxy.enabled" v-on:input="saveSettings()" />
+            <checkbox
+                label="Use proxy"
+                v-model="settings.connectivity.proxy.enabled"
+                v-on:input="saveSettings()"
+            />
             <div class="sub-settings" v-if="settings.connectivity.proxy.enabled">
                 <p class="text left">
                     Adress:
                 </p>
-                <input type="text" class="text-box" v-model="settings.connectivity.proxy.host" v-on:input="saveSettings()" >
+                <input
+                    type="text"
+                    class="text-box"
+                    v-model="settings.connectivity.proxy.host"
+                    v-on:input="saveSettings()"
+                />
                 <p class="text left right">
                     Port:
                 </p>
-                <input type="number" class="text-box" min="0" style="width:3rem" v-model="settings.connectivity.proxy.port" v-on:input="saveSettings()" >
+                <input
+                    type="number"
+                    class="text-box"
+                    min="0"
+                    style="width:3rem"
+                    v-model="settings.connectivity.proxy.port"
+                    v-on:input="saveSettings()"
+                />
             </div>
         </full-list>
 
         <full-list title="Desktop-Notifications">
-            <checkbox label="Display notifications when modpack is ready" v-model="settings.notifications.modpackReady" v-on:input="saveSettings()" />
-            <checkbox label="Display notifications about news" v-model="settings.notifications.news" v-on:input="saveSettings()" />
+            <checkbox
+                label="Display notifications when modpack is ready"
+                v-model="settings.notifications.modpackReady"
+                v-on:input="saveSettings()"
+            />
+            <checkbox
+                label="Display notifications about news"
+                v-model="settings.notifications.news"
+                v-on:input="saveSettings()"
+            />
         </full-list>
 
         <full-list title="Others" class="others">
             <a href="mailto:support@matix-media.net">Support</a>
             <a @click="openLog()">Show logs</a>
+            <a @click="reloadWindow()">Reload window</a>
             <a @click="clearCache()" v-if="!cacheCleared">Clear cache</a>
         </full-list>
     </div>
 </template>
 
 <script>
-import FullList from '../components/FullList.vue'
-import Checkbox from '../components/controls/Checkbox.vue'
-import _ from "lodash"
+import FullList from "../components/FullList.vue";
+import Checkbox from "../components/controls/Checkbox.vue";
+import _ from "lodash";
 import { exec } from "child_process";
-const { ipcRenderer } = require("electron")
+const { ipcRenderer } = require("electron");
 
 export default {
     name: "Settings",
-    components: {FullList, Checkbox},
+    components: { FullList, Checkbox },
     data() {
         return {
             isLoaded: false,
             cacheCleared: false,
-            settings: {}
-        }
+            settings: {},
+        };
     },
     mounted() {
         this.$nextTick(() => {
@@ -65,18 +107,22 @@ export default {
             this.$api.saveConfig();
         }, 1000),
         getCommandLine() {
-            switch (process.platform) { 
-                case 'darwin' : return 'open';
-                case 'win32' : return 'start';
-                case 'win64' : return 'start';
-                default : return 'xdg-open';
+            switch (process.platform) {
+                case "darwin":
+                    return "open";
+                case "win32":
+                    return "start";
+                case "win64":
+                    return "start";
+                default:
+                    return "xdg-open";
             }
         },
         openLog() {
             ipcRenderer.send("log_path");
             ipcRenderer.on("log_path", (e, args) => {
-                exec(this.getCommandLine() + " " + args.logPath)
-            })
+                exec(this.getCommandLine() + " " + args.logPath);
+            });
         },
         clearCache() {
             if (!this.cacheCleared) {
@@ -84,9 +130,12 @@ export default {
                 this.$api.clearCache();
                 ipcRenderer.send("clear_cache");
             }
-        }
-    }
-}
+        },
+        reloadWindow() {
+            location.reload();
+        },
+    },
+};
 </script>
 
 <style scoped>
@@ -95,9 +144,9 @@ div.settings {
 }
 
 .sub-settings {
-    margin-left: .7rem;
+    margin-left: 0.7rem;
     margin-bottom: 1rem;
-    padding: .5rem .8rem;
+    padding: 0.5rem 0.8rem;
     border-left: 1px solid rgba(255, 255, 255, 0.37);
 }
 
@@ -109,10 +158,10 @@ div.settings {
 }
 
 .sub-settings .text.right {
-    margin-left: .7rem;
+    margin-left: 0.7rem;
 }
 .sub-settings .text.left {
-    margin-right: .7rem;
+    margin-right: 0.7rem;
 }
 
 .text-box {
@@ -120,10 +169,10 @@ div.settings {
     border: none;
     border-radius: 3px;
     color: white;
-    padding: .3rem;
-    font-family: 'Roboto';
+    padding: 0.3rem;
+    font-family: "Roboto";
     font-size: 1.2em;
-    transition: background-color .2s;
+    transition: background-color 0.2s;
     -webkit-appearance: none;
     font-weight: 300;
 }
@@ -155,7 +204,7 @@ div.settings {
 }
 
 .full-list .content {
-    padding: .8rem;
+    padding: 0.8rem;
 }
 
 .others .content a {
@@ -165,8 +214,8 @@ div.settings {
     font-size: 14px;
     font-weight: 300;
     margin: 0px 1rem;
-    padding: .25rem 0;
-    transition: color .2s;
+    padding: 0.25rem 0;
+    transition: color 0.2s;
 }
 
 .others .content a:hover {
