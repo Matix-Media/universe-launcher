@@ -6,6 +6,7 @@ import VueMeta from "vue-meta";
 import API from "./classes/API";
 import Creator from "./classes/Creator";
 import log from "electron-log";
+import "splitpanes/dist/splitpanes.css";
 const remote = require("electron").remote;
 
 Object.assign(console, log.functions);

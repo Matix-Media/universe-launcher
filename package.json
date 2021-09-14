@@ -41,6 +41,7 @@
         "node-fetch": "^2.6.1",
         "popper.js": "^1.16.1",
         "sanitize-filename": "^1.6.3",
+        "splitpanes": "^2.3.8",
         "toml": "^3.0.0",
         "uuid": "^8.3.2",
         "vue": "^2.6.12",
