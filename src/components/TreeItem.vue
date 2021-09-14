@@ -5,7 +5,10 @@
                 <i class="fas fa-chevron-right" v-show="!isOpen"></i>
                 <i class="fas fa-chevron-down" v-show="isOpen"></i>
             </span>
-            {{ item.name }}
+            <i :class="item.icon" v-if="item.icon"></i>
+            <span class="name">
+                {{ item.name }}
+            </span>
         </div>
         <ul v-if="isFolder && isOpen" class="tree-view-children">
             <tree-item
@@ -54,7 +57,7 @@ ul.tree-view-children {
     transition: border 0.2s;
 
     &:hover {
-        border-left: 1px solid rgba(255, 255, 255, 0.3);
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
     }
 }
 
@@ -64,23 +67,33 @@ li.tree-view-item {
     cursor: pointer;
 
     .item-info {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
+        padding: 0.15rem 0;
         font-size: 0.9rem;
         font-weight: 400;
         display: flex;
         align-items: center;
-        color: rgba(255, 255, 255, 0.8);
-
+        color: rgba(255, 255, 255, 0.6);
+        transition: color 0.1s;
         &:hover {
             color: white;
         }
 
+        .name {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        i {
+            font-style: normal;
+            margin-right: 0.15rem;
+        }
+
         .folder-indicator {
             width: 1rem;
+            min-width: 1rem;
             font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.3);
         }
     }
 }
