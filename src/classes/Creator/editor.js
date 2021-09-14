@@ -13,6 +13,7 @@ export default class Editor {
     mods = [];
     worlds = [];
     resourcepacks = [];
+    fileWatcher = null;
     #events = {
         fileUpdates: [],
     };
@@ -44,7 +45,7 @@ export default class Editor {
     async load(callback = () => {}) {
         console.log('Loading "' + path.basename(this.location) + '"');
 
-        callback("Loading files...");
+        callback("Loading project information...");
 
         let content = JSON.parse(await fsp.readFile(this.location));
         this.meta = content;
@@ -106,7 +107,8 @@ export default class Editor {
         callback("Scanning files...");
 
         // eslint-disable-next-line no-unused-vars
-        chokidar.watch(this.getPath("instance")).on("all", (event, path) => {
+        this.fileWatcher = chokidar.watch(this.getPath("instance"));
+        this.fileWatcher.on("all", (event, path) => {
             for (let callback of this.#events.fileUpdates) {
                 callback(event, path);
             }

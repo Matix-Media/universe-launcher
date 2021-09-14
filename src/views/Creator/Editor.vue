@@ -10,21 +10,6 @@
                         @focus="$event.target.select()"
                     />
                     <strip-menu :menu="menu" />
-                    <!--<ul class="menu">
-                        <li>
-                            Project
-                            <ul>
-                                <li>Settings</li>
-                            </ul>
-                        </li>
-                        <li>
-                            Git
-                            <ul>
-                                <li>Commit</li>
-                                <li>Push</li>
-                            </ul>
-                        </li>
-                    </ul>-->
                 </div>
                 <ul class="quick-access">
                     <li>
@@ -40,6 +25,36 @@
                         Export
                     </li>
                 </ul>
+            </div>
+
+            <div class="workspace">
+                <splitpanes>
+                    <pane size="15" min-size="5">
+                        <full-list
+                            title="Explorer"
+                            height="86vh"
+                            class="project-explorer"
+                            padding="0"
+                            overflowY="auto"
+                        >
+                            <ul class="tree-view">
+                                <tree-item
+                                    v-for="child of project.filesList"
+                                    :key="child.path"
+                                    :item="child"
+                                />
+                            </ul>
+                        </full-list>
+                    </pane>
+                    <pane min-size="10">
+                        <tab-control>
+                            <tab title="TestFile1.txt" icon="medium-green text-icon">Test</tab>
+                            <tab title="Editor.vue" icon="medium-green text-icon"
+                                >Test2Test2Test2Test2Test2Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br
+                            /></tab>
+                        </tab-control>
+                    </pane>
+                </splitpanes>
             </div>
         </div>
 
@@ -73,13 +88,21 @@
 </template>
 
 <script>
-import Editor from "../../classes/Creator/editor";
+// eslint-disable-next-line no-unused-vars
+import { getClassWithColor as getFileIcon } from "file-icons-js";
+import { Splitpanes, Pane } from "splitpanes";
+import FullList from "../../components/FullList.vue";
+import TreeItem from "../../components/TreeItem.vue";
 import Modal from "../../components/Modal.vue";
 import StripMenu from "../../components/StripMenu.vue";
+import TabControl from "../../components/TabControl.vue";
+import Tab from "../../components/Tab.vue";
+import Editor from "../../classes/Creator/editor";
 import fsb from "../../classes/Helpers/fsb";
+import { sep as pathSeperator } from "path";
 
 export default {
-    components: { Modal, StripMenu },
+    components: { Modal, StripMenu, Splitpanes, Pane, FullList, TreeItem, TabControl, Tab },
     name: "Creator-Editor",
     data() {
         return {
@@ -97,6 +120,7 @@ export default {
             project: {
                 location: null,
                 editor: null,
+                filesList: {},
             },
         };
     },
@@ -107,20 +131,38 @@ export default {
         menu() {
             return [
                 {
-                    text: "Project",
-                    children: [{ text: "Settings" }],
+                    text: "File",
+                    children: [
+                        {
+                            text: "New",
+                            children: [
+                                {
+                                    text: "File",
+                                },
+                                {
+                                    text: "Directory",
+                                },
+                            ],
+                        },
+                        { text: "Import into project..." },
+                        { text: "Project settings..." },
+                        { text: "QUIT modpack editor" },
+                    ],
                 },
                 {
                     text: "Git",
-                    children: [{ text: "Commit" }, { text: "Push" }, {text: "Test", children: [
-                        {text: "test1"}
-                    ]}],
+                    children: [{ text: "Commit" }, { text: "Push" }],
                 },
             ];
         },
     },
     async mounted() {
         this.$nextTick(async () => {
+            await this.load();
+        });
+    },
+    methods: {
+        async load() {
             if (!this.$route.params.projectLocation) {
                 console.error("No project specified.");
                 this.errors.popup.error = new Error("No project location specified.");
@@ -143,12 +185,78 @@ export default {
 
             try {
                 this.project.editor = new Editor(this.project.location);
+
                 this.modalVisible = true;
+
+                // Hook into file update events
+                var initalFileScanComplete = false;
+                this.project.editor.on("fileUpdates", (event, filePath) => {
+                    const parsedPath = filePath.substring(
+                        this.project.editor.getPath("instance").length
+                    );
+
+                    switch (event) {
+                        case "add":
+                            {
+                                this.updateFileTree("add", "file", parsedPath);
+                            }
+                            break;
+                        case "addDir":
+                            {
+                                this.updateFileTree("add", "dir", parsedPath);
+                            }
+                            break;
+                        case "unlink":
+                            {
+                                this.updateFileTree("remove", "file", parsedPath);
+                            }
+                            break;
+                        case "unlinkDir":
+                            {
+                                this.updateFileTree("remove", "dir", parsedPath);
+                            }
+                            break;
+                        case "error":
+                            {
+                                console.error(filePath);
+                            }
+                            break;
+                        case "ready":
+                            {
+                                initalFileScanComplete = true;
+                                console.log(
+                                    "Initial file scan completed BEFORE editor setup completed."
+                                );
+                            }
+                            break;
+                        default: {
+                            console.warn("Unknown file event:", event);
+                        }
+                    }
+                });
+
+                // Load project into editor with update hook
                 await this.project.editor.load((status) => (this.loadingProject.status = status));
+
+                // Enable editor window
                 this.loadingProject.status = "Preparing workspace...";
                 this.loadingProject.editorVisible = true;
+
+                // Slight timeout for window to be displayed
                 console.log("Project loaded. Loading workspace...");
-                await new Promise((resolve) => setTimeout(() => resolve(), 1000));
+                if (!initalFileScanComplete) {
+                    await new Promise((resolve) => {
+                        this.project.editor.fileWatcher.on("ready", () => {
+                            console.log(
+                                "Initial file scan completed AFTER editor setup completed."
+                            );
+                            resolve();
+                        });
+                    });
+                } else await new Promise((resolve) => setTimeout(() => resolve(), 500));
+                this.$forceUpdate();
+
+                // Cleanup
                 console.log("Loaded workspace");
                 this.loadingProject.loading = false;
                 this.$nextTick(() => {
@@ -160,7 +268,55 @@ export default {
                 this.errors.popup.show = true;
                 this.loadingProject.loading = false;
             }
-        });
+        },
+        updateFileTree(action, type, path) {
+            if (path == "" || path == null) return;
+
+            if (path.startsWith(pathSeperator)) {
+                path = path.substring(1);
+            }
+
+            var pathParts = path.split(pathSeperator);
+
+            var currentLevel = this.project.filesList;
+            var i = -1;
+            for (let part of pathParts) {
+                i++;
+
+                if (currentLevel[part] == null) {
+                    var currentPath = pathParts.slice(0, i + 1).join(pathSeperator);
+                    var currentIcon = "medium-green text-icon"; // getFileIcon(part);
+
+                    var partIsDir = false;
+                    if (type == "dir") partIsDir = true;
+                    else partIsDir = i + 1 < pathParts.length;
+
+                    if (action == "add") {
+                        if (partIsDir)
+                            currentLevel[part] = {
+                                name: part,
+                                path: currentPath,
+                                icon: currentIcon,
+                                children: {},
+                            };
+                        else
+                            currentLevel[part] = {
+                                name: part,
+                                path: currentPath,
+                                icon: currentIcon,
+                            };
+                    } else {
+                        break;
+                    }
+                } else {
+                    if (action == "remove") {
+                        delete currentLevel[part];
+                    }
+                }
+
+                if (i < pathParts.length) currentLevel = currentLevel[part].children;
+            }
+        },
     },
 };
 </script>
@@ -215,7 +371,12 @@ div.popup-box {
 }
 
 div.project-editor {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+
     div.toolbar {
+        z-index: 1;
         backdrop-filter: blur(30px);
         background-color: rgba(255, 255, 255, 0.02);
         position: relative;
@@ -238,56 +399,13 @@ div.project-editor {
                 margin-top: 0.5rem;
                 font-size: 1.5rem;
                 color: rgba(255, 255, 255, 0.75);
-                cursor: default;
+                cursor: text;
+                transition: color 0.1s, border 0.1s;
+                border-bottom: 1px solid transparent;
                 &:focus {
                     cursor: text;
-                }
-            }
-
-            .menu {
-                list-style-type: none;
-                padding: 0;
-                margin: 0;
-                font-size: 0.9rem;
-
-                > li {
-                    display: inline-block;
-                    padding: 0.5rem 0.5rem;
-                    cursor: pointer;
-
-                    &:first-of-type {
-                        padding-left: 0;
-                    }
-
-                    ul {
-                        display: none;
-                        padding: 0;
-                        margin: 0;
-                        list-style-type: none;
-                        background-color: rgb(48, 61, 68);
-                        overflow: auto;
-                        padding: 0.5rem 0;
-                        box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-                            rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-                            rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
-                        border-radius: 3px;
-                        max-height: 15rem;
-                        line-height: 1.2em;
-                        color: #fff;
-                        position: absolute;
-                    }
-
-                    li {
-                        position: relative;
-                        cursor: pointer;
-                        color: #fff;
-                        padding: 0.2rem 1em;
-                        cursor: pointer;
-                        user-select: none;
-                        &:hover {
-                            background-color: rgba(255, 255, 255, 0.1);
-                        }
-                    }
+                    color: white;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.8);
                 }
             }
         }
@@ -321,6 +439,35 @@ div.project-editor {
                 }
             }
         }
+    }
+
+    div.workspace {
+        z-index: 0;
+        margin: 1rem;
+        height: calc(100vh - 6.5rem);
+
+        .project-explorer {
+            .tree-view {
+                list-style: none;
+                margin: 0 0 0 0.5rem;
+                padding: 0;
+            }
+        }
+
+        .tab-control {
+            height: 100%;
+        }
+    }
+}
+</style>
+
+<style lang="scss">
+.splitpanes {
+    .splitpanes__splitter {
+        margin: 0 1rem 0 1rem;
+        width: 0.2rem;
+        backdrop-filter: blur(30px);
+        background-color: rgba(255, 255, 255, 0.025);
     }
 }
 </style>

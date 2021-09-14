@@ -1,6 +1,6 @@
 <template>
     <li class="tree-view-item">
-        <div :class="{ closed: isFolder }" @click="toggle" class="item-info">
+        <div :class="{ closed: isFolder, 'is-folder': isFolder }" @click="toggle" class="item-info">
             <span v-if="isFolder" class="folder-indicator">
                 <i class="fas fa-chevron-right" v-show="!isOpen"></i>
                 <i class="fas fa-chevron-down" v-show="isOpen"></i>
@@ -51,7 +51,7 @@ export default {
 <style lang="scss" scoped>
 ul.tree-view-children {
     list-style: none;
-    margin: 0 0 0 0.26rem;
+    margin: 0 0 0 0;
     padding: 0 0 0 1rem;
     border-left: 1px solid transparent;
     transition: border 0.2s;
@@ -64,9 +64,9 @@ ul.tree-view-children {
 li.tree-view-item {
     margin: 0;
     padding: 0;
-    cursor: pointer;
 
     .item-info {
+        cursor: pointer;
         padding: 0.15rem 0;
         font-size: 0.9rem;
         font-weight: 400;
@@ -76,6 +76,9 @@ li.tree-view-item {
         transition: color 0.1s;
         &:hover {
             color: white;
+        }
+        &:not(.is-folder) {
+            margin-left: 1rem;
         }
 
         .name {
