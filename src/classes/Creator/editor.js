@@ -107,6 +107,9 @@ export default class Editor {
 
         // eslint-disable-next-line no-unused-vars
         chokidar.watch(this.getPath("instance")).on("all", (event, path) => {
+            for (let callback of this.#events.fileUpdates) {
+                callback(event, path);
+            }
             //console.log(event, path);
         });
     }
