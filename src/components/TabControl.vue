@@ -67,8 +67,9 @@ export default {
         margin: 0;
         padding: 0;
         display: flex;
-        background-color: rgba(38, 50, 56, 0.6);
+        background-color: rgba(255, 255, 255, 0.02);
         backdrop-filter: blur(30px);
+        border-bottom: 1px solid rgba(69, 90, 100, 0.65);
 
         .header-item {
             color: rgba(255, 255, 255, 0.8);
