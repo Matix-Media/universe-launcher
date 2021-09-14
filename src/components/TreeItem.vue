@@ -1,13 +1,13 @@
 <template>
-    <li>
-        <div :class="{ closed: isFolder }" @click="toggle">
-            <span v-if="isFolder">
+    <li class="tree-view-item">
+        <div :class="{ closed: isFolder }" @click="toggle" class="item-info">
+            <span v-if="isFolder" class="folder-indicator">
                 <i class="fas fa-chevron-right" v-show="!isOpen"></i>
                 <i class="fas fa-chevron-down" v-show="isOpen"></i>
             </span>
             {{ item.name }}
         </div>
-        <ul v-show="isOpen" v-if="isFolder">
+        <ul v-if="isFolder && isOpen" class="tree-view-children">
             <tree-item
                 class="item"
                 v-for="(child, index) in item.children"
@@ -32,7 +32,7 @@ export default {
     },
     computed: {
         isFolder() {
-            return this.item.children && this.item.children.length;
+            return this.item.children;
         },
     },
     methods: {
@@ -44,3 +44,44 @@ export default {
     },
 };
 </script>
+
+<style lang="scss" scoped>
+ul.tree-view-children {
+    list-style: none;
+    margin: 0 0 0 0.26rem;
+    padding: 0 0 0 1rem;
+    border-left: 1px solid transparent;
+    transition: border 0.2s;
+
+    &:hover {
+        border-left: 1px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+li.tree-view-item {
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+
+    .item-info {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: 0.9rem;
+        font-weight: 400;
+        display: flex;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.8);
+
+        &:hover {
+            color: white;
+        }
+
+        .folder-indicator {
+            width: 1rem;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+    }
+}
+</style>
