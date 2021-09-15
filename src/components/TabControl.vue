@@ -61,12 +61,15 @@ export default {
         height: 100%;
         background-color: rgba(38, 50, 56, 1);
     }
+    display: flex;
+    flex-direction: column;
 
     .header {
         list-style: none;
         margin: 0;
         padding: 0;
         display: flex;
+        min-height: 2.2rem;
         background-color: rgba(255, 255, 255, 0.02);
         backdrop-filter: blur(30px);
         border-bottom: 1px solid rgba(69, 90, 100, 0.65);
