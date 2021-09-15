@@ -312,7 +312,6 @@ export default {
 
     getLanguageByPath(path) {
         path = basename(path);
-        console.log("File:", path);
         for (let modeName in supportedModes) {
             let extensions = supportedModes[modeName][0];
             var re;
@@ -326,7 +325,6 @@ export default {
             }
             //console.log(re);
             if (path.match(new RegExp(re, "gi"))) {
-                console.log(modeName);
                 return modeName.toLowerCase();
             }
         }
