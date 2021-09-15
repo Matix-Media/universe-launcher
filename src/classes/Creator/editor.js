@@ -43,7 +43,7 @@ export default class Editor {
      * @param {loadingStatusCallback} callback Reports the loading status
      */
     async load(callback = () => {}) {
-        console.log('Loading "' + path.basename(this.location) + '"');
+        console.log('Loading "' + path.basename(this.location) + '"...');
 
         callback("Loading project information...");
 
