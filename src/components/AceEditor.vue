@@ -35,6 +35,9 @@ export default {
                 wrap: true,
                 scrollPastEnd: 0.9,
                 vScrollBarAlwaysVisible: true,
+                fontFamily: "Roboto Mono",
+                fontSize: "12px",
+                showPrintMargin: false,
             });
         },
     },
@@ -43,8 +46,38 @@ export default {
 
 <style lang="scss">
 .ace_editor {
-    .ace_gutter-cell.ace_error {
-        background-image: url("../assets/images/editor/code/error.png");
+    background-color: transparent !important;
+
+    .ace_gutter {
+        background: rgba(255, 255, 255, 0.03) !important;
+        box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+
+        .ace_gutter-cell.ace_error {
+            background-image: url("../assets/images/editor/code/error.png");
+        }
+
+        .ace_gutter-active-line {
+            background: transparent !important;
+            color: white;
+        }
+    }
+
+    .ace_scroller {
+        .ace_cursor-layer .ace_cursor {
+            transition: opacity 0.1s;
+        }
+
+        .ace_marker-layer {
+            .ace_active-line {
+                background: rgb(48, 61, 68) !important;
+            }
+            .ace_selection {
+                background: rgba(255, 255, 255, 0.2);
+            }
+            .ace_selected-word {
+                border: none;
+            }
+        }
     }
 
     .ace_tooltip {
@@ -55,7 +88,7 @@ export default {
         border-radius: 3px;
         border: none;
         max-height: 15rem;
-        font-family: Roboto;
+        font-family: "Roboto Mono";
         overflow: auto;
         padding: 0.5rem 0.6rem;
     }
