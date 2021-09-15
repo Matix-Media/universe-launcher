@@ -44,7 +44,7 @@ export default {
                 this.isOpen = !this.isOpen;
             }
             if (this.item.click) {
-                this.item.click();
+                this.item.click(this.item);
             }
         },
     },
