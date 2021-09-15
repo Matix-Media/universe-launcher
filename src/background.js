@@ -18,7 +18,6 @@ MSMC.setFetch(fetch);
 
 const shell = electron.shell;
 const isDevelopment = process.env.NODE_ENV !== "production";
-const fsp = fs.promises;
 const initPath = path.join(app.getPath("userData"), "init.json");
 
 // Scheme must be registered before the app is ready
