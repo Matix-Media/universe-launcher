@@ -1,9 +1,14 @@
 <template>
-    <div class="creator" :class="{loaded: $creator.isLoaded}">
+    <div class="creator" :class="{ loaded: $creator.isLoaded }">
         <div class="creator-loading">
             <div class="box">
                 <div class="logo">
-                    <img src="@/assets/images/branding/icon.svg" class="icon" style="width:5rem;" alt="">
+                    <img
+                        src="@/assets/images/branding/icon.svg"
+                        class="icon"
+                        style="width:5rem;"
+                        alt=""
+                    />
                     <div class="text">
                         <h1>Creator</h1>
                         <p>is loading...</p>
@@ -19,28 +24,31 @@
 </template>
 
 <script>
+import AceHelper from "../classes/Helpers/ace-helper";
+
 export default {
     name: "Creator",
     data() {
         return {
             isLoaded: false,
-        }
+        };
     },
     mounted() {
         this.$nextTick(async () => {
             await this.$creator.load();
+            console.log("Importing required libraries for editor...");
+            await AceHelper.importHeavyItems();
             this.$forceUpdate();
         });
-    }
-}
+    },
+};
 </script>
 
 <style scoped>
-
 .creator-content {
     visibility: hidden;
     opacity: 0;
-    transition: opacity .5s;
+    transition: opacity 0.5s;
 }
 
 .creator.loaded .creator-content {
@@ -61,7 +69,7 @@ export default {
 
 .creator-loading .box {
     background-color: rgba(37, 49, 55, 0.5);
-    box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.03);
+    box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.03);
     backdrop-filter: blur(15px);
     padding: 1rem 1.5rem;
     border-radius: 8px;
@@ -92,7 +100,6 @@ export default {
 .creator-loading .box .logo .text p {
     font-size: 1rem;
     font-weight: 300;
-    margin-top: -.5rem;
+    margin-top: -0.5rem;
 }
-
 </style>
