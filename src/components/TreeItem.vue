@@ -1,6 +1,6 @@
 <template>
     <li class="tree-view-item">
-        <div :class="{ closed: isFolder, 'is-folder': isFolder }" @click="toggle" class="item-info">
+        <div :class="{ closed: isFolder, 'is-folder': isFolder }" @click="action" class="item-info">
             <span v-if="isFolder" class="folder-indicator">
                 <i class="fas fa-chevron-right" v-show="!isOpen"></i>
                 <i class="fas fa-chevron-down" v-show="isOpen"></i>
@@ -39,9 +39,12 @@ export default {
         },
     },
     methods: {
-        toggle() {
+        action() {
             if (this.isFolder) {
                 this.isOpen = !this.isOpen;
+            }
+            if (this.item.click) {
+                this.item.click();
             }
         },
     },
