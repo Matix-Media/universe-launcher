@@ -55,7 +55,7 @@ export default {
     background-color: transparent !important;
 
     .ace_gutter {
-        background: rgba(255, 255, 255, 0.03) !important;
+        background: #2d383e !important;
         box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
 
         .ace_gutter-cell.ace_error {
@@ -75,18 +75,22 @@ export default {
 
         .ace_marker-layer {
             .ace_active-line {
-                background: rgb(48, 61, 68) !important;
+                background: #303d44 !important;
             }
             .ace_selection {
-                background: rgba(255, 255, 255, 0.2);
+                background: #515b60;
             }
             .ace_selected-word {
                 border: none;
             }
             .ace_bracket {
-                border-radius: 3px;
+                border-radius: 4px;
                 border-color: rgba(255, 255, 255, 0.3);
             }
+        }
+
+        .ace_text-layer .ace_line .ace_invalid {
+            background-color: #662e4a;
         }
     }
 
