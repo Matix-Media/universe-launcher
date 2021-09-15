@@ -5,6 +5,7 @@
         @init="init"
         :lang="language"
         theme="monokai"
+        :class="{ readonly: readonly }"
     />
 </template>
 
@@ -23,6 +24,10 @@ export default {
             type: String,
             default: "text",
         },
+        readonly: {
+            type: Boolean,
+            default: false,
+        },
     },
     model: {
         prop: "content",
@@ -38,6 +43,7 @@ export default {
                 fontFamily: "Roboto Mono",
                 fontSize: "12px",
                 showPrintMargin: false,
+                readOnly: this.readonly,
             });
         },
     },
@@ -95,6 +101,20 @@ export default {
         font-family: "Roboto Mono";
         overflow: auto;
         padding: 0.5rem 0.6rem;
+    }
+}
+
+.ace_editor.readonly {
+    .ace_scroller {
+        .ace_cursor-layer .ace_cursor {
+            display: none;
+        }
+        .ace_marker-layer {
+            .ace_active-line,
+            .ace_bracket {
+                display: none;
+            }
+        }
     }
 }
 </style>
