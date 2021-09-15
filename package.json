@@ -34,6 +34,7 @@
         "electron-window-state": "^5.0.3",
         "file-icons-js": "websemantics/file-icons-js",
         "is-valid-path": "^0.1.1",
+        "istextorbinary": "^6.0.0",
         "lodash": "^4.17.21",
         "markdown-it-vue": "^1.1.6",
         "minecraft-launcher-core": "^3.16.2",
