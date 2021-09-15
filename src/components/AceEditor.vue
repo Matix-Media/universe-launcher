@@ -77,6 +77,10 @@ export default {
             .ace_selected-word {
                 border: none;
             }
+            .ace_bracket {
+                border-radius: 3px;
+                border-color: rgba(255, 255, 255, 0.3);
+            }
         }
     }
 
