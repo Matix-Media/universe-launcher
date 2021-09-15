@@ -194,6 +194,41 @@ export default {
     font-style: normal;
 }
 
+@font-face {
+    font-family: "Roboto Mono";
+    font-style: normal;
+    font-weight: 300;
+    src: url("./assets/fonts/RobotoMono/RobotoMono-Light.ttf");
+}
+
+@font-face {
+    font-family: "Roboto Mono";
+    font-style: normal;
+    font-weight: 400;
+    src: url("./assets/fonts/RobotoMono/RobotoMono-Medium.ttf");
+}
+
+@font-face {
+    font-family: "Roboto Mono";
+    font-style: normal;
+    font-weight: 500;
+    src: url("./assets/fonts/RobotoMono/RobotoMono-Regular.ttf");
+}
+
+@font-face {
+    font-family: "Roboto Mono";
+    font-style: normal;
+    font-weight: 600;
+    src: url("./assets/fonts/RobotoMono/RobotoMono-SemiBold.ttf");
+}
+
+@font-face {
+    font-family: "Roboto Mono";
+    font-style: normal;
+    font-weight: 700;
+    src: url("./assets/fonts/RobotoMono/RobotoMono-Bold.ttf");
+}
+
 html {
     scrollbar-face-color: transparent;
     scrollbar-base-color: transparent;
