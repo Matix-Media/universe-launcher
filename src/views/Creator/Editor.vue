@@ -49,9 +49,30 @@
                     <pane min-size="10">
                         <tab-control>
                             <tab title="TestFile1.txt" icon="medium-green text-icon">Test</tab>
-                            <tab title="Editor.vue" icon="medium-green text-icon"
-                                >Test2Test2Test2Test2Test2Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br />Test2<br
-                            /></tab>
+                            <tab
+                                v-for="(tab, index) of project.openTabs"
+                                :key="index"
+                                :title="tab.title"
+                                :icon="tab.icon"
+                            >
+                                <ace-editor
+                                    v-if="tab.type == 'code'"
+                                    class="code-editor"
+                                    v-model="tab.contains.content"
+                                    :language="tab.contains.language"
+                                    line-numbers
+                                />
+                            </tab>
+                            <!--<tab title="Editor.vue" icon="medium-green text-icon">
+                                <ace-editor
+                                    class="code-editor"
+                                    v-model="project.openFiles.testFile1.content"
+                                    :language="project.openFiles.testFile1.language"
+                                    :options="{
+                                        automaticLayout: true,
+                                    }"
+                                />
+                            </tab>-->
                         </tab-control>
                     </pane>
                 </splitpanes>
@@ -63,7 +84,10 @@
             width="20rem"
             :closeable="modalCloseable"
             class="popup-box"
-            @close="errors.popup.show = false"
+            @close="
+                errors.popup.show = false;
+                closePopup();
+            "
             ref="modal"
         >
             <div class="loading-project" v-if="!errors.popup.error">
@@ -88,6 +112,11 @@
 </template>
 
 <script>
+import Editor from "../../classes/Creator/editor";
+import fsb from "../../classes/Helpers/fsb";
+import AceHelper from "../../classes/Helpers/ace-helper";
+import fs from "fs";
+import { sep as pathSeperator } from "path";
 // eslint-disable-next-line no-unused-vars
 import { getClassWithColor as getFileIcon } from "file-icons-js";
 import { Splitpanes, Pane } from "splitpanes";
@@ -97,15 +126,26 @@ import Modal from "../../components/Modal.vue";
 import StripMenu from "../../components/StripMenu.vue";
 import TabControl from "../../components/TabControl.vue";
 import Tab from "../../components/Tab.vue";
-import Editor from "../../classes/Creator/editor";
-import fsb from "../../classes/Helpers/fsb";
-import { sep as pathSeperator } from "path";
+import AceEditor from "../../components/AceEditor.vue";
 
 export default {
-    components: { Modal, StripMenu, Splitpanes, Pane, FullList, TreeItem, TabControl, Tab },
+    components: {
+        Splitpanes,
+        Pane,
+        Modal,
+        StripMenu,
+        FullList,
+        TreeItem,
+        TabControl,
+        Tab,
+        AceEditor,
+    },
     name: "Creator-Editor",
     data() {
         return {
+            states: {
+                initalFileScanComplete: false,
+            },
             modalVisible: false,
             loadingProject: {
                 loading: true,
@@ -121,6 +161,7 @@ export default {
                 location: null,
                 editor: null,
                 filesList: {},
+                openTabs: [],
             },
         };
     },
@@ -162,6 +203,15 @@ export default {
         });
     },
     methods: {
+        closePopup() {
+            if (
+                !this.loadingProject.loading &&
+                !this.loadingProject.editorVisible &&
+                this.errors.popup.error
+            ) {
+                this.$router.push({ name: "creator" });
+            }
+        },
         async load() {
             if (!this.$route.params.projectLocation) {
                 console.error("No project specified.");
@@ -184,56 +234,11 @@ export default {
             }
 
             try {
+                this.modalVisible = true;
                 this.project.editor = new Editor(this.project.location);
 
-                this.modalVisible = true;
-
                 // Hook into file update events
-                var initalFileScanComplete = false;
-                this.project.editor.on("fileUpdates", (event, filePath) => {
-                    const parsedPath = filePath.substring(
-                        this.project.editor.getPath("instance").length
-                    );
-
-                    switch (event) {
-                        case "add":
-                            {
-                                this.updateFileTree("add", "file", parsedPath);
-                            }
-                            break;
-                        case "addDir":
-                            {
-                                this.updateFileTree("add", "dir", parsedPath);
-                            }
-                            break;
-                        case "unlink":
-                            {
-                                this.updateFileTree("remove", "file", parsedPath);
-                            }
-                            break;
-                        case "unlinkDir":
-                            {
-                                this.updateFileTree("remove", "dir", parsedPath);
-                            }
-                            break;
-                        case "error":
-                            {
-                                console.error(filePath);
-                            }
-                            break;
-                        case "ready":
-                            {
-                                initalFileScanComplete = true;
-                                console.log(
-                                    "Initial file scan completed BEFORE editor setup completed."
-                                );
-                            }
-                            break;
-                        default: {
-                            console.warn("Unknown file event:", event);
-                        }
-                    }
-                });
+                this.project.editor.on("fileUpdates", this.handleFileUpadate);
 
                 // Load project into editor with update hook
                 await this.project.editor.load((status) => (this.loadingProject.status = status));
@@ -244,7 +249,7 @@ export default {
 
                 // Slight timeout for window to be displayed
                 console.log("Project loaded. Loading workspace...");
-                if (!initalFileScanComplete) {
+                if (!this.initalFileScanComplete) {
                     await new Promise((resolve) => {
                         this.project.editor.fileWatcher.on("ready", () => {
                             console.log(
@@ -253,8 +258,27 @@ export default {
                             resolve();
                         });
                     });
-                } else await new Promise((resolve) => setTimeout(() => resolve(), 500));
+                }
                 this.$forceUpdate();
+
+                // Do heay tasks
+                console.log("Importing heavy items...");
+                await AceHelper.importHeavyItems();
+
+                // Reopen tabs
+                this.project.openTabs.push({
+                    title: "testFile1.json",
+                    type: "code",
+                    contains: {
+                        path: this.project.location,
+                        language: "json",
+                        content: fs.readFileSync(this.project.location, "utf-8"),
+                    },
+                });
+                this.$forceUpdate();
+
+                // Slight timeout
+                await new Promise((resolve) => setTimeout(() => resolve(), 500));
 
                 // Cleanup
                 console.log("Loaded workspace");
@@ -267,6 +291,46 @@ export default {
                 this.errors.popup.error = err;
                 this.errors.popup.show = true;
                 this.loadingProject.loading = false;
+            }
+        },
+        handleFileUpadate(event, filePath) {
+            const parsedPath = filePath.substring(this.project.editor.getPath("instance").length);
+
+            switch (event) {
+                case "add":
+                    {
+                        this.updateFileTree("add", "file", parsedPath);
+                    }
+                    break;
+                case "addDir":
+                    {
+                        this.updateFileTree("add", "dir", parsedPath);
+                    }
+                    break;
+                case "unlink":
+                    {
+                        this.updateFileTree("remove", "file", parsedPath);
+                    }
+                    break;
+                case "unlinkDir":
+                    {
+                        this.updateFileTree("remove", "dir", parsedPath);
+                    }
+                    break;
+                case "error":
+                    {
+                        console.error(filePath);
+                    }
+                    break;
+                case "ready":
+                    {
+                        this.states.initalFileScanComplete = true;
+                        console.log("Initial file scan completed BEFORE editor setup completed.");
+                    }
+                    break;
+                default: {
+                    console.warn("Unknown file event:", event);
+                }
             }
         },
         updateFileTree(action, type, path) {
@@ -456,6 +520,14 @@ div.project-editor {
 
         .tab-control {
             height: 100%;
+
+            .tab-view {
+                height: 100%;
+
+                .code-editor {
+                    height: 100%;
+                }
+            }
         }
     }
 }
