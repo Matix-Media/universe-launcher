@@ -48,18 +48,19 @@
                     </pane>
                     <pane min-size="10">
                         <tab-control>
-                            <tab title="TestFile1.txt" icon="medium-green text-icon">Test</tab>
                             <tab
                                 v-for="(tab, index) of project.openTabs"
                                 :key="index"
                                 :title="tab.title"
                                 :icon="tab.icon"
+                                :class="{ 'tab-view-code': tab.type == 'code' }"
                             >
                                 <ace-editor
                                     v-if="tab.type == 'code'"
                                     class="code-editor"
-                                    v-model="tab.contains.content"
+                                    :content="tab.contains.file.content"
                                     :language="tab.contains.language"
+                                    @change="tab.contains.file.updateContent($event)"
                                     line-numbers
                                 />
                             </tab>
@@ -114,9 +115,7 @@
 <script>
 import Editor from "../../classes/Creator/editor";
 import fsb from "../../classes/Helpers/fsb";
-import AceHelper from "../../classes/Helpers/ace-helper";
-import fs from "fs";
-import { sep as pathSeperator } from "path";
+import { sep as pathSeperator, basename, join as joinPaths } from "path";
 // eslint-disable-next-line no-unused-vars
 import { getClassWithColor as getFileIcon } from "file-icons-js";
 import { Splitpanes, Pane } from "splitpanes";
@@ -127,6 +126,7 @@ import StripMenu from "../../components/StripMenu.vue";
 import TabControl from "../../components/TabControl.vue";
 import Tab from "../../components/Tab.vue";
 import AceEditor from "../../components/AceEditor.vue";
+import aceHelper from "../../classes/Helpers/ace-helper";
 
 export default {
     components: {
@@ -235,6 +235,8 @@ export default {
 
             try {
                 this.modalVisible = true;
+
+                // Initialize editor
                 this.project.editor = new Editor(this.project.location);
 
                 // Hook into file update events
@@ -244,17 +246,17 @@ export default {
                 await this.project.editor.load((status) => (this.loadingProject.status = status));
 
                 // Enable editor window
-                this.loadingProject.status = "Preparing workspace...";
+                this.loadingProject.status = "Preparing workspace (step 1/2)...";
                 this.loadingProject.editorVisible = true;
 
-                // Slight timeout for window to be displayed
                 console.log("Project loaded. Loading workspace...");
-                if (!this.initalFileScanComplete) {
+
+                // Wait for file listiner to complete initialization
+                if (!this.states.initalFileScanComplete) {
+                    console.log("Waiting for completion of inital file scan...");
                     await new Promise((resolve) => {
                         this.project.editor.fileWatcher.on("ready", () => {
-                            console.log(
-                                "Initial file scan completed AFTER editor setup completed."
-                            );
+                            console.log("Initial file scan completed");
                             resolve();
                         });
                     });
@@ -262,19 +264,24 @@ export default {
                 this.$forceUpdate();
 
                 // Do heay tasks
-                console.log("Importing heavy items...");
-                await AceHelper.importHeavyItems();
 
                 // Reopen tabs
-                this.project.openTabs.push({
-                    title: "testFile1.json",
-                    type: "code",
-                    contains: {
-                        path: this.project.location,
-                        language: "json",
-                        content: fs.readFileSync(this.project.location, "utf-8"),
-                    },
-                });
+                console.log("Reopening tabs...");
+                this.loadingProject.status = "Preparing workspace (step 2/2)...";
+
+                /*
+                    test tab
+                    this.project.openTabs.push({
+                        title: ,
+                        type: "code",
+                        icon: "medium-green text-icon",
+                        contains: {
+                            path: this.project.location,
+                            language: AceHelper.getLanguageByPath(this.project.location),
+                            content: fs.readFileSync(this.project.location, "utf-8"),
+                        },
+                    });
+                */
                 this.$forceUpdate();
 
                 // Slight timeout
@@ -325,7 +332,6 @@ export default {
                 case "ready":
                     {
                         this.states.initalFileScanComplete = true;
-                        console.log("Initial file scan completed BEFORE editor setup completed.");
                     }
                     break;
                 default: {
@@ -348,7 +354,10 @@ export default {
                 i++;
 
                 if (currentLevel[part] == null) {
-                    var currentPath = pathParts.slice(0, i + 1).join(pathSeperator);
+                    var currentPath = joinPaths(
+                        this.project.editor.getPath("instance"),
+                        pathParts.slice(0, i + 1).join(pathSeperator)
+                    );
                     var currentIcon = "medium-green text-icon"; // getFileIcon(part);
 
                     var partIsDir = false;
@@ -363,12 +372,17 @@ export default {
                                 icon: currentIcon,
                                 children: {},
                             };
-                        else
+                        else {
+                            var openFile = this.openFile;
                             currentLevel[part] = {
                                 name: part,
                                 path: currentPath,
                                 icon: currentIcon,
+                                click(item) {
+                                    openFile(item.path);
+                                },
                             };
+                        }
                     } else {
                         break;
                     }
@@ -380,6 +394,21 @@ export default {
 
                 if (i < pathParts.length) currentLevel = currentLevel[part].children;
             }
+        },
+        async openFile(path) {
+            let filename = basename(path);
+            let icon = "medium-green text-icon";
+            let language = aceHelper.getLanguageByPath(path);
+            let file = await this.project.editor.getFileEditor(path);
+            this.project.openTabs.push({
+                title: filename,
+                icon: icon,
+                type: "code",
+                contains: {
+                    file: file,
+                    language: language,
+                },
+            });
         },
     },
 };
@@ -524,8 +553,8 @@ div.project-editor {
             .tab-view {
                 height: 100%;
 
-                .code-editor {
-                    height: 100%;
+                &.tab-view-code {
+                    position: relative;
                 }
             }
         }
