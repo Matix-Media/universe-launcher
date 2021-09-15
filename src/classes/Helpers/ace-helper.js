@@ -63,7 +63,7 @@ const supportedModes = {
     Jade: ["jade|pug"],
     Java: ["java"],
     JavaScript: ["js|jsm|jsx"],
-    JSON: ["json|unvmeta"],
+    JSON: ["json|unvmeta|mcmeta"],
     JSONiq: ["jq"],
     JSP: ["jsp"],
     JSSM: ["jssm|jssm_state"],
