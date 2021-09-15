@@ -73,6 +73,7 @@ export default {
         background-color: rgba(255, 255, 255, 0.02);
         backdrop-filter: blur(30px);
         border-bottom: 1px solid rgba(69, 90, 100, 0.65);
+        flex-shrink: 0;
 
         .header-item {
             color: rgba(255, 255, 255, 0.8);
@@ -83,6 +84,7 @@ export default {
             transition: background 0.2s;
             display: inline-flex;
             align-items: center;
+            box-sizing: border-box;
 
             user-select: auto !important;
             -webkit-user-drag: element !important;
