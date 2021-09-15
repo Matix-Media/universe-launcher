@@ -5,6 +5,38 @@ import AdmZip from "adm-zip";
 import zipHelper from "../Helpers/zip-helper";
 import toml from "toml";
 import chokidar from "chokidar";
+import { debounce } from "lodash";
+import { getEncoding } from "istextorbinary/edition-es2019-esm";
+//import { parse } from "prismarine-nbt";
+
+class FileEditor {
+    path;
+    content;
+    encoding;
+
+    constructor(path) {
+        this.path = path;
+        console.log("Created file editor for", this.path);
+    }
+
+    async readFromFile() {
+        if (!this.encoding) {
+            this.encoding = getEncoding(await fsp.readFile(this.path));
+        }
+        this.content = await fsp.readFile(this.path, this.encoding);
+        return this.content;
+    }
+
+    async saveToFile() {
+        await fsp.writeFile(this.path, this.content);
+    }
+
+    async updateContent(content) {
+        console.log(content);
+        this.content = content;
+        debounce(this.saveToFile, 1000);
+    }
+}
 
 export default class Editor {
     root = null;
@@ -222,11 +254,27 @@ export default class Editor {
         //return true;
     }
 
+    /**
+     * Add an event listener
+     * @param {String} event The name of the event
+     * @param {Function} callback The callback function
+     */
     on(event, callback) {
         if (this.#events[event]) {
             this.#events[event].push(callback);
         } else {
             throw new Error("Unknown event name.");
         }
+    }
+
+    /**
+     * Get a new FileEditor by passing in a file path
+     * @param {String} path Path to the file
+     * @returns {FileEditor}
+     */
+    async getFileEditor(path) {
+        var file = new FileEditor(path);
+        await file.readFromFile();
+        return file;
     }
 }
