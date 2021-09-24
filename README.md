@@ -1,4 +1,4 @@
-![GitHub release (latest by date)](https://img.shields.io/github/downloads/Matix-Media/universe-launcher/latest/total?style=for-the-badge)  
+![GitHub release (latest by date)](https://img.shields.io/github/downloads/Matix-Media/universe-launcher/latest/total?style=for-the-badge)
 
 # UNIVERSE Launcher
 
@@ -15,13 +15,13 @@ yarn install
 ### Compiles and hot-reloads for development
 
 ```
-yarn electron:serve
+yarn serve
 ```
 
 ### Compiles and minifies for production
 
 ```
-yarn electron:build
+yarn build
 ```
 
 ### Lints and fixes files
