@@ -1,7 +1,7 @@
 <template>
     <ace-editor
         :value="content"
-        @input="$emit('change', $event)"
+        @input="update"
         @init="init"
         :lang="language"
         theme="monokai"
@@ -46,6 +46,9 @@ export default {
                 readOnly: this.readonly,
             });
         },
+        update(event) {
+            this.$emit("change", event);
+        },
     },
 };
 </script>
@@ -58,8 +61,13 @@ export default {
         background: #2d383e !important;
         box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
 
-        .ace_gutter-cell.ace_error {
-            background-image: url("../assets/images/editor/code/error.png");
+        .ace_gutter-cell {
+            .ace_fold-widget {
+                box-shadow: none !important;
+            }
+            .ace_error {
+                background-image: url("../assets/images/editor/code/error.png");
+            }
         }
 
         .ace_gutter-active-line {
