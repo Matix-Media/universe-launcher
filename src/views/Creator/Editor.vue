@@ -48,6 +48,10 @@
                     </pane>
                     <pane min-size="10">
                         <tab-control>
+                            <div v-if="project.openTabs.length == 0" class="no-tabs-open">
+                                <img src="@/assets/images/branding/logo.png" alt="" />
+                                <p>Open a tab by clicking on a file in the list on the left.</p>
+                            </div>
                             <tab
                                 v-for="(tab, index) of project.openTabs"
                                 :key="index"
@@ -55,14 +59,32 @@
                                 :icon="tab.icon"
                                 :class="{ 'tab-view-code': tab.type == 'code' }"
                             >
-                                <ace-editor
-                                    v-if="tab.type == 'code'"
-                                    class="code-editor"
-                                    :content="tab.contains.file.content"
-                                    :language="tab.contains.language"
-                                    @change="tab.contains.file.updateContent($event)"
-                                    line-numbers
-                                />
+                                <template v-if="tab.type == 'code'">
+                                    <div
+                                        v-if="isUnallowedBinaryFile(tab)"
+                                        class="file-notice file-not-supported"
+                                    >
+                                        <p>
+                                            This file is not shown because it is either binary or
+                                            uses an unsupported text encoding.
+                                        </p>
+                                        <button
+                                            class="button"
+                                            @click="tab.contains.binaryShowAnyways = true"
+                                        >
+                                            Show Anyways
+                                        </button>
+                                    </div>
+                                    <ace-editor
+                                        v-else
+                                        class="code-editor"
+                                        :content="tab.contains.file.content"
+                                        :language="tab.contains.language"
+                                        :readonly="tab.contains.file.encoding == 'binary'"
+                                        @change="tab.contains.file.updateContent($event)"
+                                        line-numbers
+                                    />
+                                </template>
                             </tab>
                             <!--<tab title="Editor.vue" icon="medium-green text-icon">
                                 <ace-editor
@@ -116,8 +138,7 @@
 import Editor from "../../classes/Creator/editor";
 import fsb from "../../classes/Helpers/fsb";
 import { sep as pathSeperator, basename, join as joinPaths } from "path";
-// eslint-disable-next-line no-unused-vars
-import { getClassWithColor as getFileIcon } from "file-icons-js";
+import { getFileIcon } from "../../classes/Helpers/file-icons";
 import { Splitpanes, Pane } from "splitpanes";
 import FullList from "../../components/FullList.vue";
 import TreeItem from "../../components/TreeItem.vue";
@@ -359,6 +380,11 @@ export default {
                         pathParts.slice(0, i + 1).join(pathSeperator)
                     );
                     var currentIcon = "medium-green text-icon"; // getFileIcon(part);
+                    try {
+                        currentIcon = getFileIcon(currentPath);
+                    } catch (err) {
+                        break;
+                    }
 
                     var partIsDir = false;
                     if (type == "dir") partIsDir = true;
@@ -407,8 +433,15 @@ export default {
                 contains: {
                     file: file,
                     language: language,
+                    binaryShowAnyways: false,
                 },
             });
+        },
+        isAllowedBinaryFile(tab) {
+            return tab.contains.file.encoding == "binary" && tab.contains.binaryAllowAnyways;
+        },
+        isUnallowedBinaryFile(tab) {
+            return tab.contains.file.encoding == "binary" && !tab.contains.binaryShowAnyways;
         },
     },
 };
@@ -550,11 +583,53 @@ div.project-editor {
         .tab-control {
             height: 100%;
 
+            .no-tabs-open {
+                width: 100%;
+                height: 100%;
+                font-size: 1rem;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                color: white;
+                opacity: 0.06;
+
+                img {
+                    width: 25rem;
+                    margin-bottom: 2rem;
+                }
+            }
+
             .tab-view {
                 height: 100%;
 
                 &.tab-view-code {
                     position: relative;
+
+                    .file-notice {
+                        padding: 1rem;
+                        font-size: 1rem;
+                        color: rgba(255, 255, 255, 0.5);
+
+                        button {
+                            margin-top: 1rem;
+
+                            border: none;
+                            border-radius: 4px;
+                            padding: 0.5rem 2rem;
+                            color: rgba(255, 255, 255, 0.8);
+                            background-color: rgba(53, 66, 75, 0.9);
+                            cursor: pointer;
+                            font-family: "Roboto";
+                            text-transform: uppercase;
+                            font-size: 0.9rem;
+                            transition: background-color 0.2s;
+
+                            &:hover {
+                                background-color: rgba(53, 66, 75, 0.6);
+                            }
+                        }
+                    }
                 }
             }
         }

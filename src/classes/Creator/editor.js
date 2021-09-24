@@ -1,4 +1,4 @@
-import { promises as fsp } from "fs";
+import { promises as fsp, constants as fsc } from "fs";
 import path from "path";
 import fsb from "../Helpers/fsb";
 import AdmZip from "adm-zip";
@@ -13,28 +13,43 @@ class FileEditor {
     path;
     content;
     encoding;
+    openMode;
+    /**
+     * @type {fsp.FileHandle}
+     * @public
+     */
+    handle;
 
     constructor(path) {
         this.path = path;
-        console.log("Created file editor for", this.path);
     }
 
     async readFromFile() {
-        if (!this.encoding) {
-            this.encoding = getEncoding(await fsp.readFile(this.path));
-        }
-        this.content = await fsp.readFile(this.path, this.encoding);
+        if (!this.encoding) this.encoding = getEncoding(await fsp.readFile(this.path));
+        if (!this.openMode) this.openMode = this.encoding === "binary" ? fsc.O_RDONLY : fsc.O_RDWR;
+        if (!this.handle) this.handle = await fsp.open(this.path, this.openMode);
+
+        console.log("File encoding:", this.encoding, "Open mode:", this.openMode);
+
+        this.content = await this.handle.readFile(this.encoding);
         return this.content;
     }
 
     async saveToFile() {
-        await fsp.writeFile(this.path, this.content);
+        console.log("Saving changes");
+        await this.handle.writeFile(this.content, { encoding: this.encoding, mode: this.openMode });
     }
 
-    async updateContent(content) {
-        console.log(content);
+    updateContent(content) {
         this.content = content;
-        debounce(this.saveToFile, 1000);
+        console.log(this.content);
+        this.saveDebounce();
+    }
+
+    saveDebounce = debounce(this.saveToFile, 1000);
+
+    close() {
+        this.handle.close();
     }
 }
 
