@@ -1,28 +1,23 @@
 <template>
     <div class="multi-select" :tabindex="tabindex">
         <p
-                v-for="(option, i) of options"
-                :key="i"
-                :class="{selected: selected.includes(option)}"
-                @click="
-                if (selected.includes(option)) {
-                    selected.remove(option);
-                } else {
-                    selected.push(option);
-                }
-                $emit('input', selected);
-                "
-            >
-                {{ option }}
-            </p>
+            v-for="(option, i) of options"
+            :key="i"
+            :class="{ selected: selected.includes(option) }"
+            @click="toggleItem(option)"
+        >
+            {{ option }}
+        </p>
     </div>
 </template>
 
 <script>
 export default {
     name: "MultiSelect",
-    created() {
-        this.selected = [];
+    data() {
+        return {
+            selected: [],
+        };
     },
     props: {
         options: {
@@ -32,33 +27,48 @@ export default {
         tabindex: {
             type: Number,
             required: false,
-            default: 0
-        }
+            default: 0,
+        },
     },
     mounted() {
         this.$emit("input", this.selected);
-    }
-}
+    },
+    methods: {
+        toggleItem(option) {
+            if (this.selected.includes(option)) {
+                var index = this.selected.indexOf(option);
+                if (index > -1) {
+                    this.selected.splice(index, 1);
+                }
+            } else {
+                this.selected.push(option);
+            }
+            this.$emit("input", this.selected);
+        },
+    },
+};
 </script>
 
 <style scoped>
 div.multi-select {
     background-color: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, .5);
-    margin-top: .7rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.7rem;
     border-radius: 2px;
     overflow: hidden;
-    padding: .5rem 0;
+    padding: 0.5rem 0;
 }
 
 div.multi-select p {
-    padding: .1rem .7rem;
+    padding: 0.1rem 0.7rem;
     cursor: pointer;
 }
 
+div.multi-select p:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
 
-div.multi-select p:hover,
 div.multi-select p.selected {
-    background-color: rgba(255, 255, 255, 0.178);
+    background-color: rgba(255, 255, 255, 0.2);
 }
 </style>
