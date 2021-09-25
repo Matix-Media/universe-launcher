@@ -29,9 +29,7 @@ export default {
         else icon = iconDB.matchName(path, true);
 
         if (!icon)
-            if (!dir) icon = iconDB.matchName(".txt").getClass();
-            else icon = "dir-type";
-        else icon = icon.getClass(0);
+            if (!dir) icon = iconDB.matchName(".txt");
 
         return icon;
     },
