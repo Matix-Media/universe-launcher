@@ -36,8 +36,15 @@ export default {
     mounted() {
         this.$nextTick(async () => {
             await this.$creator.load();
+
             console.log("Importing required libraries for editor...");
+
             await AceHelper.importHeavyItems();
+
+            await import("splitpanes/dist/splitpanes.css");
+            await import("file-icons-js/css/style.css");
+            await import("../assets/styles/editor/explorer/icon-colors.css");
+
             this.$forceUpdate();
         });
     },
