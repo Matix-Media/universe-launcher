@@ -138,7 +138,7 @@
 import Editor from "../../classes/Creator/editor";
 import fsb from "../../classes/Helpers/fsb";
 import { sep as pathSeperator, basename, join as joinPaths } from "path";
-import { getFileIcon } from "../../classes/Helpers/file-icons";
+import fileIcons from "../../classes/Helpers/file-icons";
 import { Splitpanes, Pane } from "splitpanes";
 import FullList from "../../components/FullList.vue";
 import TreeItem from "../../components/TreeItem.vue";
@@ -379,16 +379,12 @@ export default {
                         this.project.editor.getPath("instance"),
                         pathParts.slice(0, i + 1).join(pathSeperator)
                     );
-                    var currentIcon = "medium-green text-icon"; // getFileIcon(part);
-                    try {
-                        currentIcon = getFileIcon(currentPath);
-                    } catch (err) {
-                        break;
-                    }
 
                     var partIsDir = false;
                     if (type == "dir") partIsDir = true;
                     else partIsDir = i + 1 < pathParts.length;
+                    
+                    var currentIcon = fileIcons.getFileIcon(currentPath, partIsDir);
 
                     if (action == "add") {
                         if (partIsDir)
