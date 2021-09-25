@@ -1,4 +1,5 @@
-import { getClassWithColor } from "file-icons-js";
+import { db as iconDB } from "file-icons-js";
+import { basename } from "path";
 
 const customDB = [
     [/\.mca$/i, ".dat"],
@@ -18,12 +19,20 @@ export default {
         return null;
     },
 
-    getFileIcon(path) {
+    getFileIcon(path, dir = false) {
+        path = basename(path);
         var customMatch = this.matchCustomDB(path);
         if (customMatch) path = customMatch;
 
-        var icon = getClassWithColor(path);
-        console.log(icon);
-        return !icon ? getClassWithColor(".dat") : icon;
+        var icon;
+        if (!dir) icon = iconDB.matchName(path);
+        else icon = iconDB.matchName(path, true);
+
+        if (!icon)
+            if (!dir) icon = iconDB.matchName(".txt").getClass();
+            else icon = "dir-type";
+        else icon = icon.getClass(0);
+
+        return icon;
     },
 };
