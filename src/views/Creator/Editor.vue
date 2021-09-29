@@ -345,6 +345,11 @@ export default {
                         this.updateFileTree("remove", "dir", parsedPath);
                     }
                     break;
+                case "change":
+                    {
+                        console.log("File change:", filePath);
+                    }
+                    break;
                 case "error":
                     {
                         console.error(filePath);
@@ -383,7 +388,7 @@ export default {
                     var partIsDir = false;
                     if (type == "dir") partIsDir = true;
                     else partIsDir = i + 1 < pathParts.length;
-                    
+
                     var currentIcon = fileIcons.getFileIcon(currentPath, partIsDir);
 
                     if (action == "add") {
