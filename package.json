@@ -36,7 +36,7 @@
         "lodash": "^4.17.21",
         "markdown-it-vue": "^1.1.6",
         "minecraft-launcher-core": "^3.16.8",
-        "msmc": "^2.2.1",
+        "msmc": "^2.2.3",
         "popper.js": "^1.16.1",
         "sanitize-filename": "^1.6.3",
         "splitpanes": "^2.3.8",
